@@ -1,0 +1,470 @@
+/* Estilos para el contenedor principal */
+.nueva-cita-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Layout principal de la aplicación */
+.appointment-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) 2fr;
+  gap: 20px;
+}
+
+/* Sección del calendario */
+.calendar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Sección del formulario */
+.form-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+/* Estilos para el calendario */
+.calendar-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.calendar-day {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.calendar-day:hover {
+  background-color: #f0f0f0;
+  border-color: #ddd;
+}
+
+.calendar-day.other-month {
+  color: #aaa;
+  background-color: #f9f9f9;
+}
+
+.calendar-day.selected {
+  background-color: #e6f2ff;
+  color: #0d6efd;
+  font-weight: 600;
+  border-color: #0d6efd;
+}
+
+.calendar-day.today {
+  border: 2px solid #0d6efd;
+  font-weight: 600;
+}
+
+.calendar-day.past {
+  color: #ccc;
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+}
+
+.day-number {
+  font-size: 0.95rem;
+}
+
+/* Estilos para los horarios */
+.time-slots-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.time-slots-title {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.time-slot {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #dee2e6;
+}
+
+.time-slot:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.time-slot.selected {
+  background-color: #e6f2ff;
+  color: #0d6efd;
+  font-weight: 600;
+  border-color: #0d6efd;
+}
+
+.no-slots-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 1rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #dee2e6;
+}
+
+/* Estilos para el formulario en formato catálogo */
+.catalog-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catalog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catalog-card {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  height: auto;
+  margin-bottom: 0;
+}
+
+.catalog-card-header {
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.catalog-card-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.catalog-card-body {
+  padding: 0.75rem;
+}
+
+/* Estilos para la tarjeta de información de mascota */
+.pet-info-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.pet-info-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.75rem;
+}
+
+.pet-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e6f2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.pet-info-name h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.pet-info-name p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.pet-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pet-info-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* Estilos para la tarjeta de información de servicio */
+.service-info-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.service-info-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.75rem;
+}
+
+.service-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e6f2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-info-name h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.service-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-info-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* Estilos para los botones */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5c636a;
+  border-color: #565e64;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 991.98px) {
+  .appointment-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-layout {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+
+  .row > div {
+    margin-bottom: 0.75rem;
+  }
+
+  .row > div:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Añadir estos estilos para corregir el problema de los dropdowns */
+.react-select__menu {
+  z-index: 9999 !important;
+}
+
+/* Reemplazar con estos estilos más específicos */
+.react-select-container .react-select__menu {
+  z-index: 9999 !important;
+  position: absolute !important;
+}
+
+/* Estilos para la lista de servicios seleccionados */
+.selected-services-list {
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.service-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.service-item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-item-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.service-item-info {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.service-item-price {
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.service-item-remove {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.service-item-remove:hover {
+  background-color: #f8d7da;
+}
+
+.service-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: #e6f2ff;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.add-service-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Añadir estos estilos al final del archivo para asegurar que los menús de react-select aparezcan correctamente */
+
+/* Estilos para los menús de react-select */
+.react-select__menu-portal {
+  z-index: 9999 !important;
+}
+
+body .react-select__menu {
+  z-index: 9999 !important;
+}
+
+/* Asegurar que los contenedores no creen nuevos contextos de apilamiento */
+.catalog-card,
+.catalog-card-body,
+.catalog-section,
+.catalog-layout,
+.form-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Asegurar que los menús desplegables estén por encima */
+.react-select__dropdown-indicator,
+.react-select__control {
+  z-index: 2;
+}
+
