@@ -1,0 +1,129 @@
+// Variables
+$teocat-brown: #5a3921;
+$teocat-green: #7ab51d;
+$teocat-blue: #00b2e3;
+
+// Importar el módulo de color de Sass
+@use "sass:color";
+
+.hero-section {
+  margin-top: 70px; // Ajustado para el nuevo tamaño del navbar
+
+  .hero-image {
+    height: 600px;
+    object-fit: cover;
+    filter: brightness(0.7);
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 25%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+  }
+
+  .hero-button {
+    background-color: $teocat-green;
+    border-color: $teocat-green;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($teocat-green, $lightness: -10%);
+      border-color: color.adjust($teocat-green, $lightness: -10%);
+    }
+  }
+
+  // Swiper específico para móviles
+  .hero-swiper {
+    height: 500px;
+    
+    .hero-slide {
+      position: relative;
+      height: 100%;
+      
+      .hero-image {
+        height: 100%;
+      }
+      
+      .hero-content {
+        bottom: 15%;
+      }
+    }
+    
+    .swiper-pagination-bullet {
+      background-color: white;
+      opacity: 0.7;
+      
+      &-active {
+        background-color: $teocat-green;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .hero-section {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-section {
+    margin-top: 56px; // Ajustado para el navbar en móvil
+    
+    .hero-image {
+      height: 500px;
+    }
+    
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .hero-description {
+      font-size: 1rem;
+    }
+    
+    .hero-button {
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    .hero-image {
+      height: 400px;
+    }
+    
+    .hero-title {
+      font-size: 1.75rem;
+    }
+    
+    .hero-content {
+      bottom: 10%;
+    }
+  }
+}
+

@@ -1,0 +1,289 @@
+// Variables
+$teocat-brown: #5a3921;
+$teocat-green: #7ab51d;
+$teocat-blue: #00b2e3;
+
+// Importar el módulo de color de Sass
+@use "sass:color";
+
+.agendar-cita-page {
+  .page-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+    
+    .page-title {
+      color: $teocat-brown;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  // Estilos para el calendario
+  .calendar-container {
+    .appointment-calendar {
+      width: 100%;
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      
+      .react-calendar__navigation {
+        margin-bottom: 0.5rem;
+        
+        button {
+          min-width: 44px;
+          background: none;
+          font-size: 1rem;
+          color: $teocat-brown;
+          
+          &:enabled:hover,
+          &:enabled:focus {
+            background-color: #f8f9fa;
+          }
+          
+          &.react-calendar__navigation__label {
+            font-weight: 600;
+          }
+        }
+      }
+      
+      .react-calendar__month-view__weekdays {
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 0.75rem;
+        
+        abbr {
+          text-decoration: none;
+          color: $teocat-brown;
+        }
+      }
+      
+      .react-calendar__tile {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+        
+        &:enabled:hover,
+        &:enabled:focus {
+          background-color: #f8f9fa;
+        }
+        
+        &--active {
+          background-color: $teocat-green !important;
+          color: white;
+          
+          &:enabled:hover,
+          &:enabled:focus {
+            background-color: color.adjust($teocat-green, $lightness: -10%) !important;
+          }
+        }
+        
+        &--now {
+          background-color: rgba($teocat-green, 0.1);
+          
+          &:enabled:hover,
+          &:enabled:focus {
+            background-color: rgba($teocat-green, 0.2);
+          }
+        }
+      }
+    }
+  }
+  
+  // Estilos para los horarios
+  .time-slots-container {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    
+    .time-slot-btn {
+      min-width: 80px;
+      
+      &.btn-success {
+        background-color: $teocat-green;
+        border-color: $teocat-green;
+        
+        &:hover, &:focus {
+          background-color: color.adjust($teocat-green, $lightness: -10%);
+          border-color: color.adjust($teocat-green, $lightness: -10%);
+        }
+      }
+    }
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+      
+      &:hover {
+        background: #aaa;
+      }
+    }
+  }
+  
+  // Estilos para las tarjetas de servicios
+  .service-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .service-card-img-container {
+      height: 150px;
+      overflow: hidden;
+      
+      .service-card-img {
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+    }
+    
+    &:hover .service-card-img {
+      transform: scale(1.1);
+    }
+    
+    .service-card-title {
+      color: $teocat-brown;
+      font-weight: 600;
+    }
+    
+    .service-card-description {
+      color: #6c757d;
+      font-size: 0.875rem;
+      height: 60px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    
+    .service-card-price {
+      font-weight: 700;
+      color: $teocat-green;
+    }
+    
+    .service-card-duration {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    .service-card-btn {
+      background-color: $teocat-green;
+      border-color: $teocat-green;
+      
+      &:hover, &:focus {
+        background-color: color.adjust($teocat-green, $lightness: -10%);
+        border-color: color.adjust($teocat-green, $lightness: -10%);
+      }
+    }
+  }
+  
+  // Estilos para las tarjetas de mascotas
+  .pet-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    
+    &:hover {
+      border-color: #dee2e6;
+    }
+    
+    &.selected {
+      border-color: $teocat-green;
+      background-color: rgba($teocat-green, 0.05);
+    }
+    
+    .pet-icon {
+      color: $teocat-brown;
+    }
+  }
+  
+  // Estilos para el resumen de la cita
+  .appointment-summary {
+    .selected-services-list {
+      .service-price {
+        font-weight: 600;
+        color: $teocat-green;
+      }
+    }
+    
+    .appointment-submit-btn {
+      background-color: $teocat-green;
+      border-color: $teocat-green;
+      
+      &:hover, &:focus {
+        background-color: color.adjust($teocat-green, $lightness: -10%);
+        border-color: color.adjust($teocat-green, $lightness: -10%);
+      }
+    }
+    
+    .appointment-policies {
+      a {
+        color: $teocat-brown;
+        text-decoration: none;
+        
+        &:hover {
+          color: $teocat-green;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  
+  // Estilos para los formularios
+  .form-control, .form-select {
+    &:focus {
+      border-color: $teocat-green;
+      box-shadow: 0 0 0 0.25rem rgba(122, 181, 29, 0.25);
+    }
+  }
+  
+  .input-group-text {
+    background-color: #f8f9fa;
+    color: $teocat-brown;
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .agendar-cita-page {
+    .appointment-summary {
+      position: static !important;
+      margin-top: 2rem;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .agendar-cita-page {
+    .calendar-container {
+      .appointment-calendar {
+        font-size: 0.875rem;
+        
+        .react-calendar__tile {
+          padding: 0.5rem;
+        }
+      }
+    }
+    
+    .time-slots-container {
+      max-height: 200px;
+      
+      .time-slot-btn {
+        min-width: 70px;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+

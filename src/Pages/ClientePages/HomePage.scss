@@ -1,0 +1,629 @@
+// Variables
+$teocat-brown: #5a3921;
+$teocat-green: #7ab51d;
+$teocat-blue: #00b2e3;
+
+// Importar el módulo de color de Sass
+@use "sass:color";
+
+.home-page {
+  // Estilos generales
+  .section-title {
+    color: $teocat-brown;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background-color: $teocat-green;
+      border-radius: 3px;
+    }
+    
+    &.text-center::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  
+  .section-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+
+  // Categorías
+  .categories-section {
+    background-color: #ffffff;
+    padding: 5rem 0;
+    
+    .category-card {
+      transition: all 0.4s ease;
+      border-radius: 1rem;
+      overflow: hidden;
+      
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        
+        .category-link {
+          color: $teocat-green;
+        }
+      }
+      
+      .category-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1.5rem auto 1rem;
+        
+        i {
+          font-size: 2rem;
+          color: white;
+        }
+      }
+      
+      .category-title {
+        color: $teocat-brown;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .category-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+      
+      .category-link {
+        color: $teocat-brown;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+    }
+  }
+  
+  // Banner promocional
+  .promo-banner {
+    background-color: #f8f9fa;
+    overflow: hidden;
+    
+    .promo-content {
+      position: relative;
+      
+      .promo-image-col {
+        padding: 0;
+        
+        .promo-image-container {
+          height: 500px;
+          overflow: hidden;
+          
+          .promo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+      
+      .promo-text-col {
+        padding: 0;
+        background-color: $teocat-brown;
+        color: white;
+        
+        .promo-text-container {
+          padding: 4rem;
+          
+          .promo-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+          }
+          
+          .promo-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+          }
+          
+          .promo-cta {
+            .promo-button {
+              background-color: $teocat-green;
+              border-color: $teocat-green;
+              color: white;
+              padding: 0.75rem 2rem;
+              font-weight: 600;
+              transition: all 0.3s ease;
+              
+              &:hover {
+                background-color: color.adjust($teocat-green, $lightness: -10%);
+                border-color: color.adjust($teocat-green, $lightness: -10%);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+              }
+            }
+            
+            .promo-terms {
+              font-size: 0.8rem;
+              margin-top: 1rem;
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Productos Destacados
+  .featured-products-section {
+    background-color: #f8f9fa;
+    padding: 5rem 0;
+    
+    .view-all-btn {
+      border-color: $teocat-green;
+      color: $teocat-green;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: $teocat-green;
+        color: white;
+        transform: translateY(-3px);
+      }
+    }
+    
+    .products-swiper {
+      padding-bottom: 50px;
+      
+      .swiper-pagination {
+        bottom: 0;
+        
+        .swiper-pagination-bullet {
+          background-color: $teocat-brown;
+          opacity: 0.5;
+          
+          &-active {
+            opacity: 1;
+            background-color: $teocat-green;
+          }
+        }
+      }
+      
+      .swiper-button-next,
+      .swiper-button-prev {
+        color: $teocat-green;
+        
+        &:after {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+  
+  // Beneficios
+  .benefits-section {
+    padding: 5rem 0;
+    background-color: white;
+    
+    .benefit-card {
+      transition: all 0.4s ease;
+      border-radius: 1rem;
+      
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+        
+        .benefit-icon {
+          background-color: $teocat-green;
+          color: white;
+        }
+      }
+      
+      .benefit-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-color: rgba($teocat-green, 0.1);
+        color: $teocat-green;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        transition: all 0.3s ease;
+        
+        i {
+          font-size: 1.75rem;
+        }
+      }
+      
+      .benefit-title {
+        color: $teocat-brown;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+      }
+      
+      .benefit-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+      }
+    }
+  }
+  
+  // Servicios
+  .services-section {
+    background-color: #f8f9fa;
+    padding: 5rem 0;
+    
+    .view-all-btn {
+      border-color: $teocat-green;
+      color: $teocat-green;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: $teocat-green;
+        color: white;
+        transform: translateY(-3px);
+      }
+    }
+    
+    .services-swiper {
+      padding-bottom: 50px;
+      
+      .swiper-pagination {
+        bottom: 0;
+        
+        .swiper-pagination-bullet {
+          background-color: $teocat-brown;
+          opacity: 0.5;
+          
+          &-active {
+            opacity: 1;
+            background-color: $teocat-green;
+          }
+        }
+      }
+      
+      .swiper-button-next,
+      .swiper-button-prev {
+        color: $teocat-green;
+        
+        &:after {
+          font-size: 1.5rem;
+        }
+      }
+    }
+    
+    .schedule-btn {
+      background-color: $teocat-green;
+      border-color: $teocat-green;
+      color: white;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: color.adjust($teocat-green, $lightness: -10%);
+        border-color: color.adjust($teocat-green, $lightness: -10%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+  
+  // Testimonios
+  .testimonials-section {
+    padding: 5rem 0;
+    background-color: white;
+    
+    .testimonials-swiper {
+      padding-bottom: 50px;
+      
+      .swiper-pagination {
+        bottom: 0;
+        
+        .swiper-pagination-bullet {
+          background-color: $teocat-brown;
+          opacity: 0.5;
+          
+          &-active {
+            opacity: 1;
+            background-color: $teocat-green;
+          }
+        }
+      }
+    }
+    
+    .testimonial-card {
+      transition: all 0.4s ease;
+      border-radius: 1rem;
+      padding: 1rem;
+      
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .testimonial-text {
+        font-style: italic;
+        color: #495057;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+      
+      .testimonial-image-container {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        
+        .testimonial-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      
+      .testimonial-name {
+        color: $teocat-brown;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      
+      .testimonial-pet {
+        color: #6c757d;
+        font-size: 0.85rem;
+      }
+    }
+  }
+  
+  // Mapa
+  .map-section {
+    background-color: #f8f9fa;
+    padding: 5rem 0;
+    
+    .location-card {
+      border-radius: 1rem;
+      height: 100%;
+      
+      .location-title {
+        color: $teocat-brown;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+      
+      .location-description {
+        color: #6c757d;
+        margin-bottom: 2rem;
+      }
+      
+      .location-info {
+        .location-info-item {
+          display: flex;
+          margin-bottom: 1.5rem;
+          
+          .location-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba($teocat-green, 0.1);
+            color: $teocat-green;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            
+            i {
+              font-size: 1.25rem;
+            }
+          }
+          
+          .location-text {
+            h5 {
+              color: $teocat-brown;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+              font-size: 1rem;
+            }
+            
+            p {
+              color: #6c757d;
+              margin-bottom: 0.25rem;
+              font-size: 0.95rem;
+            }
+          }
+        }
+      }
+      
+      .directions-btn {
+        background-color: $teocat-green;
+        border-color: $teocat-green;
+        color: white;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background-color: color.adjust($teocat-green, $lightness: -10%);
+          border-color: color.adjust($teocat-green, $lightness: -10%);
+          transform: translateY(-3px);
+        }
+      }
+    }
+    
+    .map-container {
+      height: 450px;
+      
+      iframe {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  
+  // Call to Action
+  .cta-section {
+    padding: 0;
+    
+    .cta-container {
+      background: linear-gradient(rgba(90, 57, 33, 0.9), rgba(90, 57, 33, 0.9)), url('https://images.unsplash.com/photo-1450778869180-41d0601e046e?q=80&w=1920') center/cover no-repeat;
+      padding: 5rem 0;
+      color: white;
+      
+      .cta-content {
+        max-width: 800px;
+        margin: 0 auto;
+        
+        .cta-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          color: white;
+        }
+        
+        .cta-description {
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
+          opacity: 0.9;
+        }
+        
+        .cta-buttons {
+          .cta-button {
+            background-color: $teocat-green;
+            border-color: $teocat-green;
+            color: white;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background-color: color.adjust($teocat-green, $lightness: -10%);
+              border-color: color.adjust($teocat-green, $lightness: -10%);
+              transform: translateY(-3px);
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+          }
+          
+          .cta-button-outline {
+            border-color: white;
+            color: white;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background-color: white;
+              color: $teocat-brown;
+              transform: translateY(-3px);
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .home-page {
+    .promo-banner {
+      .promo-content {
+        .promo-image-col {
+          .promo-image-container {
+            height: 400px;
+          }
+        }
+        
+        .promo-text-col {
+          .promo-text-container {
+            padding: 3rem;
+            
+            .promo-title {
+              font-size: 2rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .cta-section {
+      .cta-container {
+        .cta-content {
+          .cta-title {
+            font-size: 2rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .home-page {
+    .section-title {
+      font-size: 1.75rem;
+    }
+    
+    .promo-banner {
+      .promo-content {
+        .promo-image-col {
+          .promo-image-container {
+            height: 300px;
+          }
+        }
+        
+        .promo-text-col {
+          .promo-text-container {
+            padding: 2rem;
+            
+            .promo-title {
+              font-size: 1.75rem;
+            }
+            
+            .promo-description {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .map-section {
+      .map-container {
+        height: 350px;
+      }
+    }
+    
+    .cta-section {
+      .cta-container {
+        .cta-content {
+          .cta-title {
+            font-size: 1.75rem;
+          }
+          
+          .cta-description {
+            font-size: 1rem;
+          }
+          
+          .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            
+            .cta-button, .cta-button-outline {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
