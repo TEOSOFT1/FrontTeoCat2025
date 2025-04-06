@@ -12,6 +12,7 @@ import SpecificationsSection from "../../../Components/AdminComponents/Productos
 import ImagesSection from "../../../Components/AdminComponents/ProductosComponents/ImagesSection"
 import PricingSection from "../../../Components/AdminComponents/ProductosComponents/PricingSection"
 import AdditionalInfoSection from "../../../Components/AdminComponents/ProductosComponents/AdditionalInfoSection"
+import { uploadImageToCloudinary } from "../../../Services/uploadImageToCloudinary" // Importamos la función
 
 /**
  * Componente para registrar un nuevo producto o editar uno existente
@@ -62,6 +63,7 @@ const RegistrarProducto = () => {
   // Estado para manejar las imágenes
   const [imagenes, setImagenes] = useState([null, null, null, null])
   const [imagenesPreview, setImagenesPreview] = useState([null, null, null, null])
+  const [imagenesLoading, setImagenesLoading] = useState([false, false, false, false]) // Estado para controlar la carga de cada imagen
 
   // Estado para las categorías (simulado)
   const [categorias, setCategorias] = useState([
@@ -217,7 +219,7 @@ const RegistrarProducto = () => {
    * @param {Event} e - Evento del input file
    * @param {Number} index - Índice de la imagen (0-3)
    */
-  const handleImageUpload = (e, index) => {
+  const handleImageUpload = async (e, index) => {
     const file = e.target.files[0]
     if (file) {
       // Validar que sea una imagen
@@ -235,20 +237,56 @@ const RegistrarProducto = () => {
       // Crear una copia de los arrays
       const newImagenes = [...imagenes]
       const newImagenesPreview = [...imagenesPreview]
+      const newImagenesLoading = [...imagenesLoading]
 
-      // Actualizar la imagen y su vista previa
+      // Actualizar la imagen y su vista previa local temporal
       newImagenes[index] = file
       newImagenesPreview[index] = URL.createObjectURL(file)
 
-      // Actualizar los estados
+      // Indicar que esta imagen está cargando
+      newImagenesLoading[index] = true
+      setImagenesLoading(newImagenesLoading)
+
+      // Actualizar los estados con la vista previa local
       setImagenes(newImagenes)
       setImagenesPreview(newImagenesPreview)
 
-      // Actualizar el formData con las imágenes
-      setFormData({
-        ...formData,
-        imagenes: newImagenes,
-      })
+      try {
+        // Subir la imagen a Cloudinary en la carpeta 'productos'
+        const imageUrl = await uploadImageToCloudinary(file, "productos")
+
+        if (imageUrl) {
+          // Actualizar la vista previa con la URL de Cloudinary
+          const updatedImagenesPreview = [...imagenesPreview]
+
+          // Revocar la URL temporal para liberar memoria
+          if (newImagenesPreview[index] && newImagenesPreview[index].startsWith("blob:")) {
+            URL.revokeObjectURL(newImagenesPreview[index])
+          }
+
+          updatedImagenesPreview[index] = imageUrl
+          setImagenesPreview(updatedImagenesPreview)
+
+          // Actualizar el formData con las imágenes
+          const updatedImagenes = [...imagenes]
+          updatedImagenes[index] = imageUrl // Guardamos la URL en lugar del archivo
+
+          setFormData({
+            ...formData,
+            imagenes: updatedImagenes,
+          })
+        } else {
+          toast.error("Error al subir la imagen. Intente nuevamente.")
+        }
+      } catch (error) {
+        console.error("Error al subir la imagen:", error)
+        toast.error("Error al subir la imagen. Intente nuevamente.")
+      } finally {
+        // Indicar que esta imagen ya no está cargando
+        const finalImagenesLoading = [...imagenesLoading]
+        finalImagenesLoading[index] = false
+        setImagenesLoading(finalImagenesLoading)
+      }
     }
   }
 
@@ -523,6 +561,12 @@ const RegistrarProducto = () => {
    * Manejador para guardar el producto
    */
   const handleSaveProduct = () => {
+    // Verificar si hay imágenes cargando
+    if (imagenesLoading.some((loading) => loading)) {
+      toast.warning("Espere a que se completen las cargas de imágenes")
+      return
+    }
+
     // Validar el formulario
     if (!validateForm()) {
       // Mostrar notificación de error general
@@ -554,19 +598,8 @@ const RegistrarProducto = () => {
       return
     }
 
-    // Procesar las imágenes
-    // En un caso real, aquí se subirían las imágenes al servidor y se obtendrían las URLs
-
-    // Simulamos las URLs de las imágenes (en producción, estas vendrían después de subir las imágenes)
-    const imageUrls = imagenes
-      .map((img, index) => {
-        if (img) {
-          // En un caso real, aquí iría la URL devuelta por el servidor
-          return `https://example.com/uploads/producto_${Date.now()}_${index}.jpg`
-        }
-        return null
-      })
-      .filter((url) => url !== null)
+    // Filtrar las URLs de las imágenes (ahora son URLs de Cloudinary)
+    const imageUrls = formData.imagenes.filter((img) => img !== null && typeof img === "string")
 
     // Concatenar las URLs con un delimitador para guardarlas en un solo campo
     const fotosString = imageUrls.join("|")
@@ -680,6 +713,12 @@ const RegistrarProducto = () => {
                   onImageUpload={handleImageUpload}
                   onRemoveImage={handleRemoveImage}
                 />
+                {/* Indicador de carga de imágenes */}
+                {imagenesLoading.some((loading) => loading) && (
+                  <div className="alert alert-info mt-2 py-2">
+                    <small>Subiendo imágenes a Cloudinary...</small>
+                  </div>
+                )}
               </div>
 
               <div className="col-md-6">
@@ -708,7 +747,12 @@ const RegistrarProducto = () => {
                 <X size={18} className="me-1" />
                 Cancelar
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleSaveProduct}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSaveProduct}
+                disabled={imagenesLoading.some((loading) => loading)}
+              >
                 <Save size={18} className="me-1" />
                 {isEditing ? "Actualizar Producto" : "Guardar Producto"}
               </button>

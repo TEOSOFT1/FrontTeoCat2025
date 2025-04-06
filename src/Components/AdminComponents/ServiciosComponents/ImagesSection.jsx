@@ -36,7 +36,7 @@ const ImagesSection = ({ imagenes, imagenesPreview, formErrors, onImageUpload, o
                     <small className="text-muted text-center">
                       {imagenes[index]?.name?.length > 15
                         ? imagenes[index]?.name?.substring(0, 15) + "..."
-                        : imagenes[index]?.name}
+                        : imagenes[index]?.name || "Imagen subida"}
                     </small>
                   </>
                 ) : (

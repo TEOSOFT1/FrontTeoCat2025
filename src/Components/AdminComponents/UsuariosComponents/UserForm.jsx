@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Save, Eye, EyeOff } from "lucide-react"
+import { uploadImageToCloudinary } from "../../../Services/uploadImageToCloudinary" // Importamos la función
 
 /**
  * Componente de formulario para crear/editar/ver usuarios
@@ -20,8 +21,49 @@ const UserForm = ({
   // Estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [imageLoading, setImageLoading] = useState(false)
 
   const isViewMode = modalTitle === "Ver Detalles del Usuario"
+
+  // Función para manejar la carga de imágenes
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    // Creamos un objeto de evento simulado para mantener la compatibilidad con onInputChange
+    const event = {
+      target: {
+        name: e.target.name,
+        value: file, // Mantenemos el archivo en el estado temporal para mostrar el nombre
+      },
+    }
+
+    // Actualizamos el estado del formulario con el archivo seleccionado
+    onInputChange(event)
+
+    // Mostramos indicador de carga
+    setImageLoading(true)
+
+    try {
+      // Subimos la imagen a Cloudinary en la carpeta 'usuarios'
+      const imageUrl = await uploadImageToCloudinary(file, "usuarios")
+
+      if (imageUrl) {
+        // Actualizamos el estado del formulario con la URL de la imagen
+        const urlEvent = {
+          target: {
+            name: e.target.name,
+            value: imageUrl,
+          },
+        }
+        onInputChange(urlEvent)
+      }
+    } catch (error) {
+      console.error("Error al subir la imagen:", error)
+    } finally {
+      setImageLoading(false)
+    }
+  }
 
   return (
     <div className="modal fade" id="userModal" tabIndex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
@@ -158,10 +200,11 @@ const UserForm = ({
                     className="form-control"
                     id="foto"
                     name="foto"
-                    onChange={onInputChange}
-                    disabled={isViewMode}
+                    onChange={handleImageUpload}
+                    disabled={isViewMode || imageLoading}
                     accept="image/*"
                   />
+                  {imageLoading && <small className="form-text text-info">Subiendo imagen...</small>}
                   {formData.foto && typeof formData.foto === "object" && (
                     <small className="form-text text-success">Archivo seleccionado: {formData.foto.name}</small>
                   )}
@@ -273,7 +316,12 @@ const UserForm = ({
             </button>
 
             {!isViewMode && (
-              <button type="button" className="btn btn-primary d-flex align-items-center" onClick={onSave}>
+              <button
+                type="button"
+                className="btn btn-primary d-flex align-items-center"
+                onClick={onSave}
+                disabled={imageLoading}
+              >
                 <Save size={18} className="me-1" />
                 Guardar Usuario
               </button>

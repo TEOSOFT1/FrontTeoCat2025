@@ -18,6 +18,7 @@ const MascotaForm = ({
   onFotoChange,
   onSave,
   onClose,
+  disableSave, // Nuevo prop para deshabilitar el botón de guardar durante la carga
 }) => {
   const isViewMode = modalTitle === "Ver Detalles de la Mascota"
 
@@ -157,10 +158,15 @@ const MascotaForm = ({
                           name="foto"
                           accept="image/*"
                           onChange={onFotoChange}
-                          disabled={isViewMode}
+                          disabled={isViewMode || disableSave}
                         />
                       </div>
                       <small className="text-muted">Formatos aceptados: JPG, PNG, GIF. Máximo 5MB.</small>
+                      {disableSave && (
+                        <div className="text-info mt-1">
+                          <small>Subiendo imagen a Cloudinary...</small>
+                        </div>
+                      )}
                     </div>
                     {fotoPreview && (
                       <div className="flex-shrink-0">
@@ -183,9 +189,14 @@ const MascotaForm = ({
             </button>
 
             {!isViewMode && (
-              <button type="button" className="btn btn-primary d-flex align-items-center" onClick={onSave}>
+              <button
+                type="button"
+                className="btn btn-primary d-flex align-items-center"
+                onClick={onSave}
+                disabled={disableSave}
+              >
                 <Save size={18} className="me-1" />
-                Guardar Mascota
+                {disableSave ? "Subiendo imagen..." : "Guardar Mascota"}
               </button>
             )}
           </div>

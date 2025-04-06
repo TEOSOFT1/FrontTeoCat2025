@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
 import MascotaForm from "../../../Components/AdminComponents/MascotasComponents/MascotaForm"
 import DeleteConfirmModal from "../../../Components/AdminComponents/MascotasComponents/DeleteConfirmModal"
+import { uploadImageToCloudinary } from "../../../Services/uploadImageToCloudinary" // Importamos la función
 
 /**
  * Componente para la gestión de mascotas
@@ -29,6 +30,7 @@ const Mascotas = () => {
   // Estado para la foto
   const [fotoMascota, setFotoMascota] = useState(null)
   const [fotoPreview, setFotoPreview] = useState(null)
+  const [isImageLoading, setIsImageLoading] = useState(false) // Estado para controlar la carga de la imagen
 
   // Estado para el formulario
   const [formData, setFormData] = useState({
@@ -309,17 +311,54 @@ const Mascotas = () => {
    * Manejador para cambios en el input de foto
    * @param {Event} e - Evento del input
    */
-  const handleFotoChange = (e) => {
+  const handleFotoChange = async (e) => {
     const file = e.target.files[0]
-    if (file) {
-      setFotoMascota(file)
+    if (!file) return
 
-      // Crear URL para previsualización
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFotoPreview(reader.result)
+    // Validar que sea una imagen
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor, seleccione un archivo de imagen válido")
+      return
+    }
+
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen es demasiado grande. El tamaño máximo es 5MB.")
+      return
+    }
+
+    // Guardar el archivo para referencia
+    setFotoMascota(file)
+
+    // Crear URL para previsualización temporal
+    const localPreview = URL.createObjectURL(file)
+    setFotoPreview(localPreview)
+
+    // Indicar que la imagen está cargando
+    setIsImageLoading(true)
+
+    try {
+      // Subir la imagen a Cloudinary en la carpeta 'mascotas'
+      const imageUrl = await uploadImageToCloudinary(file, "mascotas")
+
+      if (imageUrl) {
+        // Revocar la URL temporal para liberar memoria
+        URL.revokeObjectURL(localPreview)
+
+        // Actualizar la vista previa con la URL de Cloudinary
+        setFotoPreview(imageUrl)
+
+        // Ya no necesitamos guardar el archivo, solo la URL
+        setFotoMascota(null)
+      } else {
+        toast.error("Error al subir la imagen. Intente nuevamente.")
       }
-      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error("Error al subir la imagen:", error)
+      toast.error("Error al subir la imagen. Intente nuevamente.")
+    } finally {
+      // Indicar que la imagen ya no está cargando
+      setIsImageLoading(false)
     }
   }
 
@@ -328,6 +367,12 @@ const Mascotas = () => {
    * Valida los datos y envía la información
    */
   const handleSaveMascota = () => {
+    // Verificar si hay una imagen cargando
+    if (isImageLoading) {
+      toast.warning("Espere a que se complete la carga de la imagen")
+      return
+    }
+
     // Validaciones básicas
     if (!formData.nombre.trim() || !formData.especie || !formData.fechaNacimiento) {
       // Notificación de error
@@ -403,7 +448,7 @@ const Mascotas = () => {
         tamaño: formData.tamaño,
         fechaNacimiento: formData.fechaNacimiento,
         estado: "Activo",
-        foto: fotoPreview, // Guardar la URL de la foto
+        foto: fotoPreview, // Guardar la URL de la foto (ahora es la URL de Cloudinary)
       }
 
       setMascotas([...mascotas, newMascota])
@@ -515,6 +560,7 @@ const Mascotas = () => {
         onFotoChange={handleFotoChange}
         onSave={handleSaveMascota}
         onClose={handleCloseModal}
+        disableSave={isImageLoading} // Pasar el estado de carga al formulario
       />
 
       {/* Modal de confirmación para eliminar */}
