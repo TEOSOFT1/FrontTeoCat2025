@@ -2,17 +2,22 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Save, ArrowLeft, X, Camera, Plus, Trash2 } from "lucide-react"
+import { Save, ArrowLeft } from "lucide-react"
+import "../../../Styles/AdminStyles/ToastStyles.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import "../../../Styles/AdminStyles/ToastStyles.css"
+import BasicInfoSection from "../../../Components/AdminComponents/ServiciosComponents/BasicInfoSection"
+import PricingSection from "../../../Components/AdminComponents/ServiciosComponents/PricingSection"
+import BenefitsSection from "../../../Components/AdminComponents/ServiciosComponents/BenefitsSection"
+import IncludesSection from "../../../Components/AdminComponents/ServiciosComponents/IncludesSection"
+import ImagesSection from "../../../Components/AdminComponents/ServiciosComponents/ImagesSection"
 
 /**
  * Componente para registrar un nuevo servicio
  * Versión de página completa del formulario de servicios
  */
 const RegistrarServicio = () => {
-  // Modificar el estado inicial del formulario para incluir los campos faltantes
+  // Estado para el formulario
   const [formData, setFormData] = useState({
     idTipoServicio: "",
     nombre: "",
@@ -51,6 +56,16 @@ const RegistrarServicio = () => {
     },
     { id: 5, nombre: "Desparasitación", descripcion: "Tratamiento para eliminar parásitos internos y externos." },
   ])
+
+  // Estado para errores de validación
+  const [formErrors, setFormErrors] = useState({
+    idTipoServicio: "",
+    nombre: "",
+    duracion: "",
+    precioPequeño: "",
+    precioGrande: "",
+    imagenes: "",
+  })
 
   // Referencias para las notificaciones
   const toastIds = useRef({})
@@ -140,6 +155,14 @@ const RegistrarServicio = () => {
         [name]: value,
       })
     }
+
+    // Limpiar el error específico cuando el usuario comienza a escribir
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: "",
+      })
+    }
   }
 
   /**
@@ -173,6 +196,14 @@ const RegistrarServicio = () => {
       // Actualizar los estados
       setImagenes(newImagenes)
       setImagenesPreview(newImagenesPreview)
+
+      // Limpiar el error de imágenes si existía
+      if (formErrors.imagenes) {
+        setFormErrors({
+          ...formErrors,
+          imagenes: "",
+        })
+      }
     }
   }
 
@@ -209,28 +240,25 @@ const RegistrarServicio = () => {
   /**
    * Manejador para agregar un nuevo beneficio
    */
-  const handleAddBeneficio = () => {
-    if (nuevoBeneficio.trim() === "") {
+  const handleAddBeneficio = (beneficio) => {
+    if (beneficio.trim() === "") {
       return
     }
 
     // Verificar si el beneficio ya existe
-    if (formData.beneficios.includes(nuevoBeneficio.trim())) {
+    if (formData.beneficios.includes(beneficio.trim())) {
       toast.error("Este beneficio ya ha sido agregado")
       return
     }
 
     // Agregar el nuevo beneficio
-    const updatedBeneficios = [...formData.beneficios, nuevoBeneficio.trim()]
+    const updatedBeneficios = [...formData.beneficios, beneficio.trim()]
 
     // Actualizar el formData
     setFormData({
       ...formData,
       beneficios: updatedBeneficios,
     })
-
-    // Limpiar el campo
-    setNuevoBeneficio("")
   }
 
   /**
@@ -250,14 +278,14 @@ const RegistrarServicio = () => {
   /**
    * Manejador para agregar un nuevo elemento a "Que incluye"
    */
-  const handleAddQueIncluye = () => {
-    if (nuevoQueIncluye.nombre.trim() === "" || nuevoQueIncluye.valor.trim() === "") {
+  const handleAddQueIncluye = (item) => {
+    if (item.nombre.trim() === "" || item.valor.trim() === "") {
       return
     }
 
     // Verificar si ya existe un elemento con el mismo nombre
     const existeNombre = formData.queIncluye.some(
-      (item) => item.nombre.toLowerCase() === nuevoQueIncluye.nombre.trim().toLowerCase(),
+      (existingItem) => existingItem.nombre.toLowerCase() === item.nombre.trim().toLowerCase(),
     )
 
     if (existeNombre) {
@@ -269,8 +297,8 @@ const RegistrarServicio = () => {
     const updatedQueIncluye = [
       ...formData.queIncluye,
       {
-        nombre: nuevoQueIncluye.nombre.trim(),
-        valor: nuevoQueIncluye.valor.trim(),
+        nombre: item.nombre.trim(),
+        valor: item.valor.trim(),
       },
     ]
 
@@ -279,9 +307,6 @@ const RegistrarServicio = () => {
       ...formData,
       queIncluye: updatedQueIncluye,
     })
-
-    // Limpiar los campos
-    setNuevoQueIncluye({ nombre: "", valor: "" })
   }
 
   /**
@@ -298,67 +323,71 @@ const RegistrarServicio = () => {
     })
   }
 
-  // Modificar la función handleSaveServicio para formatear los datos correctamente
-  const handleSaveServicio = () => {
-    // Validaciones básicas
-    if (
-      !formData.idTipoServicio ||
-      !formData.nombre ||
-      !formData.precioPequeño ||
-      !formData.precioGrande ||
-      !formData.duracion
-    ) {
-      // Notificación de error
-      if (toastIds.current.error) {
-        toast.dismiss(toastIds.current.error)
-      }
-
-      toastIds.current.error = toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>Por favor, complete todos los campos obligatorios.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
+  /**
+   * Validar el formulario completo
+   * @returns {boolean} - True si el formulario es válido, false en caso contrario
+   */
+  const validateForm = () => {
+    let isValid = true
+    const errors = {
+      idTipoServicio: "",
+      nombre: "",
+      duracion: "",
+      precioPequeño: "",
+      precioGrande: "",
+      imagenes: "",
     }
 
-    // Validar que precio y duración sean números válidos
-    if (
-      isNaN(Number.parseFloat(formData.precioPequeño)) ||
-      isNaN(Number.parseFloat(formData.precioGrande)) ||
-      isNaN(Number.parseFloat(formData.duracion))
-    ) {
-      if (toastIds.current.error) {
-        toast.dismiss(toastIds.current.error)
-      }
+    // Validar tipo de servicio
+    if (!formData.idTipoServicio) {
+      errors.idTipoServicio = "Por favor, seleccione un tipo de servicio"
+      isValid = false
+    }
 
-      toastIds.current.error = toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>El precio y la duración deben ser valores numéricos válidos.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
+    // Validar nombre
+    if (!formData.nombre.trim()) {
+      errors.nombre = "El nombre del servicio es obligatorio"
+      isValid = false
+    }
+
+    // Validar duración
+    if (!formData.duracion || formData.duracion === "0") {
+      errors.duracion = "La duración debe ser mayor a 0 minutos"
+      isValid = false
+    } else if (isNaN(Number.parseInt(formData.duracion))) {
+      errors.duracion = "La duración debe ser un número válido"
+      isValid = false
+    }
+
+    // Validar precios
+    if (!formData.precioPequeño || isNaN(Number.parseFloat(formData.precioPequeño))) {
+      errors.precioPequeño = "El precio para mascotas pequeñas es obligatorio y debe ser un número válido"
+      isValid = false
+    }
+
+    if (!formData.precioGrande || isNaN(Number.parseFloat(formData.precioGrande))) {
+      errors.precioGrande = "El precio para mascotas grandes es obligatorio y debe ser un número válido"
+      isValid = false
     }
 
     // Validar que al menos haya una imagen
     if (!imagenes.some((img) => img !== null)) {
+      errors.imagenes = "Por favor, suba al menos una imagen para el servicio"
+      isValid = false
+    }
+
+    setFormErrors(errors)
+    return isValid
+  }
+
+  /**
+   * Manejador para guardar el servicio
+   * Valida los datos y envía la información
+   */
+  const handleSaveServicio = () => {
+    // Validar el formulario
+    if (!validateForm()) {
+      // Mostrar notificación de error general
       if (toastIds.current.error) {
         toast.dismiss(toastIds.current.error)
       }
@@ -366,7 +395,7 @@ const RegistrarServicio = () => {
       toastIds.current.error = toast.error(
         <div>
           <strong>Error</strong>
-          <p>Por favor, suba al menos una imagen para el servicio.</p>
+          <p>Por favor, corrija los errores en el formulario.</p>
         </div>,
         {
           position: "top-right",
@@ -459,28 +488,6 @@ const RegistrarServicio = () => {
     }
   }, [imagenesPreview])
 
-  // Estilos para el slider de precio
-  const sliderStyles = {
-    container: {
-      padding: "0.5rem 0",
-    },
-    rangeInput: {
-      height: "1.5rem",
-      padding: 0,
-      backgroundColor: "transparent",
-      width: "100%",
-    },
-    labels: {
-      display: "flex",
-      justifyContent: "space-between",
-      marginTop: "0.25rem",
-    },
-    readonlyTextarea: {
-      backgroundColor: "#f8f9fa",
-      cursor: "default",
-    },
-  }
-
   return (
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -494,305 +501,48 @@ const RegistrarServicio = () => {
       <div className="card">
         <div className="card-body">
           <form className="service-form">
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <label htmlFor="idTipoServicio" className="form-label">
-                  Tipo de Servicio <span className="text-danger">*</span>
-                </label>
-                <select
-                  className="form-select"
-                  id="idTipoServicio"
-                  name="idTipoServicio"
-                  value={formData.idTipoServicio}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Seleccione un tipo de servicio</option>
-                  {tiposServicio.map((tipo) => (
-                    <option key={tipo.id} value={tipo.id}>
-                      {tipo.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6">
-                <label htmlFor="duracion" className="form-label">
-                  Duración (minutos) <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="duracion"
-                  name="duracion"
-                  value={formData.duracion}
-                  onChange={handleInputChange}
-                  min="1"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Agregar un campo para el nombre del servicio */}
-            <div className="mb-3">
-              <label htmlFor="nombre" className="form-label">
-                Nombre del Servicio <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="descripcion" className="form-label">
-                Descripción
-              </label>
-              <textarea
-                className="form-control"
-                id="descripcion"
-                name="descripcion"
-                rows="3"
-                value={formData.descripcion}
-                onChange={handleInputChange}
-                style={sliderStyles.readonlyTextarea}
-              ></textarea>
-              <small className="text-muted">
-                La descripción se completa automáticamente según el tipo de servicio seleccionado.
-              </small>
-            </div>
+            {/* Sección de información básica */}
+            <BasicInfoSection
+              formData={formData}
+              formErrors={formErrors}
+              tiposServicio={tiposServicio}
+              handleInputChange={handleInputChange}
+            />
 
             {/* Sección de precios */}
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <label htmlFor="precioPequeño" className="form-label">
-                  Precio Pequeño: ${formatNumber(Number.parseInt(formData.precioPequeño))}{" "}
-                  <span className="text-danger">*</span>
-                </label>
-                <div style={sliderStyles.container}>
-                  <input
-                    type="range"
-                    className="form-range"
-                    id="precioPequeño"
-                    name="precioPequeño"
-                    value={formData.precioPequeño}
-                    onChange={handleInputChange}
-                    min="40000"
-                    max="100000"
-                    step="1000"
-                    required
-                    style={sliderStyles.rangeInput}
-                  />
-                  <div style={sliderStyles.labels}>
-                    <small className="text-muted">$40.000</small>
-                    <small className="text-muted">$100.000</small>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <label htmlFor="precioGrande" className="form-label">
-                  Precio Grande: ${formatNumber(Number.parseInt(formData.precioGrande))}{" "}
-                  <span className="text-danger">*</span>
-                </label>
-                <div style={sliderStyles.container}>
-                  <input
-                    type="range"
-                    className="form-range"
-                    id="precioGrande"
-                    name="precioGrande"
-                    value={formData.precioGrande}
-                    onChange={handleInputChange}
-                    min="60000"
-                    max="120000"
-                    step="1000"
-                    required
-                    style={sliderStyles.rangeInput}
-                  />
-                  <div style={sliderStyles.labels}>
-                    <small className="text-muted">$60.000</small>
-                    <small className="text-muted">$120.000</small>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PricingSection
+              formData={formData}
+              formErrors={formErrors}
+              formatNumber={formatNumber}
+              handleInputChange={handleInputChange}
+            />
 
-            {/* Sección de Beneficios (equivalente a Características) */}
-            <div className="mb-3">
-              <label className="form-label">Beneficios</label>
-              <div className="input-group mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Añadir beneficio (ej: Mejora la salud capilar)"
-                  value={nuevoBeneficio}
-                  onChange={(e) => setNuevoBeneficio(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="btn btn-outline-primary"
-                  onClick={handleAddBeneficio}
-                  disabled={nuevoBeneficio.trim() === ""}
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
+            {/* Sección de beneficios */}
+            <BenefitsSection
+              beneficios={formData.beneficios}
+              nuevoBeneficio={nuevoBeneficio}
+              setNuevoBeneficio={setNuevoBeneficio}
+              onAddBeneficio={handleAddBeneficio}
+              onRemoveBeneficio={handleRemoveBeneficio}
+            />
 
-              {formData.beneficios && formData.beneficios.length > 0 ? (
-                <div className="row row-cols-1 row-cols-md-3 g-2 mt-2">
-                  {formData.beneficios.map((beneficio, index) => (
-                    <div key={index} className="col">
-                      <div className="d-flex align-items-center border rounded p-2">
-                        <span className="me-auto text-truncate">{beneficio}</span>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger ms-2"
-                          onClick={() => handleRemoveBeneficio(index)}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted small">No hay beneficios agregados</p>
-              )}
-            </div>
+            {/* Sección de que incluye */}
+            <IncludesSection
+              queIncluye={formData.queIncluye}
+              nuevoQueIncluye={nuevoQueIncluye}
+              setNuevoQueIncluye={setNuevoQueIncluye}
+              onAddQueIncluye={handleAddQueIncluye}
+              onRemoveQueIncluye={handleRemoveQueIncluye}
+            />
 
-            {/* Sección de Que Incluye (equivalente a Especificaciones Técnicas) */}
-            <div className="mb-3">
-              <label className="form-label">Que Incluye</label>
-              <div className="row g-2 mb-2">
-                <div className="col-md-5">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre (ej: Sesión)"
-                    value={nuevoQueIncluye.nombre}
-                    onChange={(e) => setNuevoQueIncluye({ ...nuevoQueIncluye, nombre: e.target.value })}
-                  />
-                </div>
-                <div className="col-md-5">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Valor (ej: 60 minutos)"
-                    value={nuevoQueIncluye.valor}
-                    onChange={(e) => setNuevoQueIncluye({ ...nuevoQueIncluye, valor: e.target.value })}
-                  />
-                </div>
-                <div className="col-md-2">
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary w-100"
-                    onClick={handleAddQueIncluye}
-                    disabled={nuevoQueIncluye.nombre.trim() === "" || nuevoQueIncluye.valor.trim() === ""}
-                  >
-                    <Plus size={18} />
-                  </button>
-                </div>
-              </div>
-
-              {formData.queIncluye && formData.queIncluye.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-sm table-bordered">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Elemento</th>
-                        <th>Detalle</th>
-                        <th style={{ width: "50px" }}>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {formData.queIncluye.map((item, index) => (
-                        <tr key={index}>
-                          <td>{item.nombre}</td>
-                          <td>{item.valor}</td>
-                          <td className="text-center">
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => handleRemoveQueIncluye(index)}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-muted small">No hay elementos agregados</p>
-              )}
-            </div>
-
-            {/* Mantener la sección de múltiples imágenes */}
-            <div className="mb-3">
-              <label className="form-label">
-                Fotos del Servicio (Máximo 4) <span className="text-danger">*</span>
-              </label>
-              <div className="row g-2">
-                {[0, 1, 2, 3].map((index) => (
-                  <div key={index} className="col-md-3 col-6">
-                    <div className="card h-100">
-                      <div className="card-body p-2 d-flex flex-column align-items-center justify-content-center">
-                        {imagenesPreview[index] ? (
-                          <>
-                            <div className="position-relative w-100">
-                              <img
-                                src={imagenesPreview[index] || "/placeholder.svg"}
-                                alt={`Imagen ${index + 1}`}
-                                className="img-fluid rounded mb-2"
-                                style={{ maxHeight: "100px", objectFit: "contain" }}
-                              />
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                onClick={() => handleRemoveImage(index)}
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-                            <small className="text-muted text-center">
-                              {imagenes[index]?.name?.length > 15
-                                ? imagenes[index]?.name?.substring(0, 15) + "..."
-                                : imagenes[index]?.name}
-                            </small>
-                          </>
-                        ) : (
-                          <>
-                            <label
-                              htmlFor={`imagen-${index}`}
-                              className="btn btn-outline-secondary mb-1"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <Camera size={18} />
-                            </label>
-                            <small className="text-muted">Imagen {index + 1}</small>
-                            <input
-                              type="file"
-                              className="d-none"
-                              id={`imagen-${index}`}
-                              onChange={(e) => handleImageUpload(e, index)}
-                              accept="image/*"
-                            />
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <small className="text-muted d-block mt-1">
-                Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB por imagen.
-              </small>
-              <small className="text-muted d-block">La primera imagen será la principal del servicio.</small>
-            </div>
+            {/* Sección de imágenes */}
+            <ImagesSection
+              imagenes={imagenes}
+              imagenesPreview={imagenesPreview}
+              formErrors={formErrors}
+              onImageUpload={handleImageUpload}
+              onRemoveImage={handleRemoveImage}
+            />
 
             <div className="d-flex justify-content-end mt-4">
               <button type="button" className="btn btn-secondary me-2" onClick={handleCancel}>

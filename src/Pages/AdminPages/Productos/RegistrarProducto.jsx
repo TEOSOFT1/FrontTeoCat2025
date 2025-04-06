@@ -2,10 +2,16 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Save, ArrowLeft, X, Camera, Calendar, Plus, Trash2 } from 'lucide-react'
+import { Save, ArrowLeft, X } from "lucide-react"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import BasicInfoSection from "../../../Components/AdminComponents/ProductosComponents/BasicInfoSection"
+import CharacteristicsSection from "../../../Components/AdminComponents/ProductosComponents/CharacteristicsSection"
+import SpecificationsSection from "../../../Components/AdminComponents/ProductosComponents/SpecificationsSection"
+import ImagesSection from "../../../Components/AdminComponents/ProductosComponents/ImagesSection"
+import PricingSection from "../../../Components/AdminComponents/ProductosComponents/PricingSection"
+import AdditionalInfoSection from "../../../Components/AdminComponents/ProductosComponents/AdditionalInfoSection"
 
 /**
  * Componente para registrar un nuevo producto o editar uno existente
@@ -57,13 +63,6 @@ const RegistrarProducto = () => {
   const [imagenes, setImagenes] = useState([null, null, null, null])
   const [imagenesPreview, setImagenesPreview] = useState([null, null, null, null])
 
-  // Estados para características y especificaciones
-  const [nuevaCaracteristica, setNuevaCaracteristica] = useState("")
-  const [nuevaEspecificacion, setNuevaEspecificacion] = useState({
-    nombre: "",
-    valor: "",
-  })
-
   // Estado para las categorías (simulado)
   const [categorias, setCategorias] = useState([
     { id: 1, nombre: "Alimentos" },
@@ -107,7 +106,7 @@ const RegistrarProducto = () => {
           { nombre: "Peso", valor: "500g" },
           { nombre: "Color", valor: "Azul" },
         ],
-        fotos: "https://example.com/uploads/producto_1.jpg|https://example.com/uploads/producto_2.jpg"
+        fotos: "https://example.com/uploads/producto_1.jpg|https://example.com/uploads/producto_2.jpg",
       }
 
       setFormData(productoEditando)
@@ -116,13 +115,14 @@ const RegistrarProducto = () => {
       if (productoEditando.fotos) {
         const fotosArray = productoEditando.fotos.split("|")
         const newImagenesPreview = [...imagenesPreview]
-        
+
         fotosArray.forEach((url, index) => {
-          if (index < 4) { // Máximo 4 imágenes
+          if (index < 4) {
+            // Máximo 4 imágenes
             newImagenesPreview[index] = url
           }
         })
-        
+
         setImagenesPreview(newImagenesPreview)
       }
     }
@@ -265,7 +265,7 @@ const RegistrarProducto = () => {
     newImagenes[index] = null
 
     // Revocar la URL para liberar memoria
-    if (imagenesPreview[index] && imagenesPreview[index].startsWith('blob:')) {
+    if (imagenesPreview[index] && imagenesPreview[index].startsWith("blob:")) {
       URL.revokeObjectURL(imagenesPreview[index])
     }
     newImagenesPreview[index] = null
@@ -310,28 +310,25 @@ const RegistrarProducto = () => {
   /**
    * Manejador para agregar una nueva característica
    */
-  const handleAddCaracteristica = () => {
-    if (nuevaCaracteristica.trim() === "") {
+  const handleAddCaracteristica = (caracteristica) => {
+    if (caracteristica.trim() === "") {
       return
     }
 
     // Verificar si la característica ya existe
-    if (formData.caracteristicas.includes(nuevaCaracteristica.trim())) {
+    if (formData.caracteristicas.includes(caracteristica.trim())) {
       toast.error("Esta característica ya ha sido agregada")
       return
     }
 
     // Agregar la nueva característica
-    const updatedCaracteristicas = [...formData.caracteristicas, nuevaCaracteristica.trim()]
+    const updatedCaracteristicas = [...formData.caracteristicas, caracteristica.trim()]
 
     // Actualizar el formData
     setFormData({
       ...formData,
       caracteristicas: updatedCaracteristicas,
     })
-
-    // Limpiar el campo
-    setNuevaCaracteristica("")
   }
 
   /**
@@ -351,14 +348,14 @@ const RegistrarProducto = () => {
   /**
    * Manejador para agregar una nueva especificación
    */
-  const handleAddEspecificacion = () => {
-    if (nuevaEspecificacion.nombre.trim() === "" || nuevaEspecificacion.valor.trim() === "") {
+  const handleAddEspecificacion = (especificacion) => {
+    if (especificacion.nombre.trim() === "" || especificacion.valor.trim() === "") {
       return
     }
 
     // Verificar si ya existe una especificación con el mismo nombre
     const existeNombre = formData.especificaciones.some(
-      (spec) => spec.nombre.toLowerCase() === nuevaEspecificacion.nombre.trim().toLowerCase(),
+      (spec) => spec.nombre.toLowerCase() === especificacion.nombre.trim().toLowerCase(),
     )
 
     if (existeNombre) {
@@ -370,8 +367,8 @@ const RegistrarProducto = () => {
     const updatedEspecificaciones = [
       ...formData.especificaciones,
       {
-        nombre: nuevaEspecificacion.nombre.trim(),
-        valor: nuevaEspecificacion.valor.trim(),
+        nombre: especificacion.nombre.trim(),
+        valor: especificacion.valor.trim(),
       },
     ]
 
@@ -380,9 +377,6 @@ const RegistrarProducto = () => {
       ...formData,
       especificaciones: updatedEspecificaciones,
     })
-
-    // Limpiar los campos
-    setNuevaEspecificacion({ nombre: "", valor: "" })
   }
 
   /**
@@ -544,7 +538,7 @@ const RegistrarProducto = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-        }
+        },
       )
 
       // Hacer scroll al primer error
@@ -562,7 +556,7 @@ const RegistrarProducto = () => {
 
     // Procesar las imágenes
     // En un caso real, aquí se subirían las imágenes al servidor y se obtendrían las URLs
-    
+
     // Simulamos las URLs de las imágenes (en producción, estas vendrían después de subir las imágenes)
     const imageUrls = imagenes
       .map((img, index) => {
@@ -615,7 +609,7 @@ const RegistrarProducto = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      }
+      },
     )
 
     // Esperar a que se muestre la notificación y luego redirigir
@@ -655,401 +649,56 @@ const RegistrarProducto = () => {
       <div className="card">
         <div className="card-body">
           <form className="product-form">
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <label htmlFor="nombre" className="form-label">
-                  Nombre del Producto <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  className={`form-control ${formErrors.nombre ? "is-invalid" : ""}`}
-                  id="nombre"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleInputChange}
-                  maxLength={100}
-                  required
-                />
-                {formErrors.nombre && <div className="invalid-feedback">{formErrors.nombre}</div>}
-                <small className="form-text text-muted">Máximo 100 caracteres.</small>
-              </div>
-              <div className="col-md-6">
-                <label htmlFor="categoria" className="form-label">
-                  Categoría <span className="text-danger">*</span>
-                </label>
-                <select
-                  className={`form-select ${formErrors.categoria ? "is-invalid" : ""}`}
-                  id="categoria"
-                  name="categoria"
-                  value={formData.categoria}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Seleccione una categoría</option>
-                  {categorias.map((categoria) => (
-                    <option key={categoria.id} value={categoria.nombre}>
-                      {categoria.nombre}
-                    </option>
-                  ))}
-                </select>
-                {formErrors.categoria && <div className="invalid-feedback">{formErrors.categoria}</div>}
-              </div>
-            </div>
+            {/* Sección de información básica */}
+            <BasicInfoSection
+              formData={formData}
+              formErrors={formErrors}
+              categorias={categorias}
+              handleInputChange={handleInputChange}
+            />
 
-            <div className="mb-3">
-              <label htmlFor="descripcion" className="form-label">
-                Descripción
-              </label>
-              <textarea
-                className={`form-control ${formErrors.descripcion ? "is-invalid" : ""}`}
-                id="descripcion"
-                name="descripcion"
-                rows="3"
-                value={formData.descripcion}
-                onChange={handleInputChange}
-                maxLength={500}
-              ></textarea>
-              {formErrors.descripcion && <div className="invalid-feedback">{formErrors.descripcion}</div>}
-              <small className="form-text text-muted">Máximo 500 caracteres.</small>
-            </div>
+            {/* Sección de características */}
+            <CharacteristicsSection
+              caracteristicas={formData.caracteristicas}
+              onAddCaracteristica={handleAddCaracteristica}
+              onRemoveCaracteristica={handleRemoveCaracteristica}
+            />
 
-            {/* Sección de Características */}
-            <div className="mb-3">
-              <label className="form-label">Características</label>
-              <div className="input-group mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Añadir característica (ej: Resistente al agua)"
-                  value={nuevaCaracteristica}
-                  onChange={(e) => setNuevaCaracteristica(e.target.value)}
-                  maxLength={100}
-                />
-                <button
-                  type="button"
-                  className="btn btn-outline-primary"
-                  onClick={handleAddCaracteristica}
-                  disabled={nuevaCaracteristica.trim() === ""}
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-              <small className="form-text text-muted">Máximo 100 caracteres por característica.</small>
-
-              {formData.caracteristicas && formData.caracteristicas.length > 0 ? (
-                <div className="row row-cols-1 row-cols-md-3 g-2 mt-2">
-                  {formData.caracteristicas.map((caracteristica, index) => (
-                    <div key={index} className="col">
-                      <div className="d-flex align-items-center border rounded p-2">
-                        <span className="me-auto text-truncate">{caracteristica}</span>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger ms-2"
-                          onClick={() => handleRemoveCaracteristica(index)}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted small">No hay características agregadas</p>
-              )}
-            </div>
-
-            {/* Sección de Especificaciones */}
-            <div className="mb-3">
-              <label className="form-label">Especificaciones Técnicas</label>
-              <div className="row g-2 mb-2">
-                <div className="col-md-5">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre (ej: Material)"
-                    value={nuevaEspecificacion.nombre}
-                    onChange={(e) => setNuevaEspecificacion({ ...nuevaEspecificacion, nombre: e.target.value })}
-                    maxLength={50}
-                  />
-                </div>
-                <div className="col-md-5">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Valor (ej: Aluminio)"
-                    value={nuevaEspecificacion.valor}
-                    onChange={(e) => setNuevaEspecificacion({ ...nuevaEspecificacion, valor: e.target.value })}
-                    maxLength={100}
-                  />
-                </div>
-                <div className="col-md-2">
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary w-100"
-                    onClick={handleAddEspecificacion}
-                    disabled={nuevaEspecificacion.nombre.trim() === "" || nuevaEspecificacion.valor.trim() === ""}
-                  >
-                    <Plus size={18} />
-                  </button>
-                </div>
-              </div>
-              <small className="form-text text-muted">Máximo 50 caracteres para el nombre y 100 para el valor.</small>
-
-              {formData.especificaciones && formData.especificaciones.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-sm table-bordered">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Especificación</th>
-                        <th>Valor</th>
-                        <th style={{ width: "50px" }}>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {formData.especificaciones.map((especificacion, index) => (
-                        <tr key={index}>
-                          <td>{especificacion.nombre}</td>
-                          <td>{especificacion.valor}</td>
-                          <td className="text-center">
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => handleRemoveEspecificacion(index)}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-muted small">No hay especificaciones agregadas</p>
-              )}
-            </div>
+            {/* Sección de especificaciones */}
+            <SpecificationsSection
+              especificaciones={formData.especificaciones}
+              onAddEspecificacion={handleAddEspecificacion}
+              onRemoveEspecificacion={handleRemoveEspecificacion}
+            />
 
             <div className="row mb-3">
+              {/* Sección de imágenes */}
               <div className="col-md-6">
-                <label className="form-label">Fotos del Producto (Máximo 4)</label>
-                <div className="row g-2">
-                  {[0, 1, 2, 3].map((index) => (
-                    <div key={index} className="col-6">
-                      <div className="card h-100">
-                        <div className="card-body p-2 d-flex flex-column align-items-center justify-content-center">
-                          {imagenesPreview[index] ? (
-                            <>
-                              <div className="position-relative w-100">
-                                <img
-                                  src={imagenesPreview[index] || "/placeholder.svg"}
-                                  alt={`Imagen ${index + 1}`}
-                                  className="img-fluid rounded mb-2"
-                                  style={{ maxHeight: "100px", objectFit: "contain" }}
-                                />
-                                <button
-                                  type="button"
-                                  className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                  onClick={() => handleRemoveImage(index)}
-                                >
-                                  <X size={16} />
-                                </button>
-                              </div>
-                              <small className="text-muted text-center">
-                                {imagenes[index]?.name?.length > 15
-                                  ? imagenes[index]?.name?.substring(0, 15) + "..."
-                                  : imagenes[index]?.name}
-                              </small>
-                            </>
-                          ) : (
-                            <>
-                              <label
-                                htmlFor={`imagen-${index}`}
-                                className="btn btn-outline-secondary mb-1"
-                                style={{ cursor: "pointer" }}
-                              >
-                                <Camera size={18} />
-                              </label>
-                              <small className="text-muted">Imagen {index + 1}</small>
-                              <input
-                                type="file"
-                                className="d-none"
-                                id={`imagen-${index}`}
-                                onChange={(e) => handleImageUpload(e, index)}
-                                accept="image/*"
-                              />
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <small className="form-text text-muted">
-                  Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB por imagen.
-                </small>
+                <ImagesSection
+                  imagenes={imagenes}
+                  imagenesPreview={imagenesPreview}
+                  onImageUpload={handleImageUpload}
+                  onRemoveImage={handleRemoveImage}
+                />
               </div>
 
               <div className="col-md-6">
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="stock" className="form-label">
-                      Stock <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      className={`form-control ${formErrors.stock ? "is-invalid" : ""}`}
-                      id="stock"
-                      name="stock"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      min="0"
-                      max="9999"
-                      required
-                    />
-                    {formErrors.stock && <div className="invalid-feedback">{formErrors.stock}</div>}
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="precio" className="form-label">
-                      Precio Base <span className="text-danger">*</span>
-                    </label>
-                    <div className="input-group">
-                      <span className="input-group-text">$</span>
-                      <input
-                        type="number"
-                        className={`form-control ${formErrors.precio ? "is-invalid" : ""}`}
-                        id="precio"
-                        name="precio"
-                        value={formData.precio}
-                        onChange={handleInputChange}
-                        min="0"
-                        required
-                      />
-                      {formErrors.precio && <div className="invalid-feedback">{formErrors.precio}</div>}
-                    </div>
-                  </div>
-                </div>
+                {/* Sección de precios y stock */}
+                <PricingSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  precioConIva={precioConIva}
+                  formatNumber={formatNumber}
+                  handleInputChange={handleInputChange}
+                />
 
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="iva" className="form-label">
-                      IVA
-                    </label>
-                    <div className="input-group">
-                      <select
-                        className="form-select"
-                        id="iva"
-                        name="iva"
-                        value={formData.iva}
-                        onChange={handleInputChange}
-                      >
-                        <option value="0">0%</option>
-                        <option value="5">5%</option>
-                        <option value="19">19%</option>
-                        <option value="NA">No Aplica</option>
-                      </select>
-                      <span className="input-group-text">%</span>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">Precio Final</label>
-                    <div className="input-group">
-                      <span className="input-group-text">$</span>
-                      <input
-                        type="text"
-                        className="form-control bg-light"
-                        value={formatNumber(precioConIva.precioFinal)}
-                        readOnly
-                      />
-                    </div>
-                    <small className="form-text text-muted">IVA: ${formatNumber(precioConIva.valorIva)}</small>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="codigoBarras" className="form-label">
-                      Código de Barras
-                    </label>
-                    <div className="input-group">
-                      <input
-                        type="text"
-                        className={`form-control ${formErrors.codigoBarras ? "is-invalid" : ""}`}
-                        id="codigoBarras"
-                        name="codigoBarras"
-                        value={formData.codigoBarras}
-                        onChange={handleInputChange}
-                        maxLength={14}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={handleScanBarcode}
-                        title="Escanear código de barras"
-                      >
-                        <Camera size={18} />
-                      </button>
-                      {formErrors.codigoBarras && <div className="invalid-feedback">{formErrors.codigoBarras}</div>}
-                    </div>
-                    <small className="form-text text-muted">Entre 8 y 14 dígitos numéricos.</small>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="referencia" className="form-label">
-                      Referencia
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.referencia ? "is-invalid" : ""}`}
-                      id="referencia"
-                      name="referencia"
-                      value={formData.referencia}
-                      onChange={handleInputChange}
-                      maxLength={50}
-                    />
-                    {formErrors.referencia && <div className="invalid-feedback">{formErrors.referencia}</div>}
-                    <small className="form-text text-muted">Código o referencia interna del producto.</small>
-                  </div>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label d-block">Fecha de Vencimiento</label>
-                  <div className="row g-2 align-items-center">
-                    <div className="col-auto">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          id="noVence"
-                          name="noVence"
-                          checked={formData.noVence}
-                          onChange={handleInputChange}
-                        />
-                        <label className="form-check-label" htmlFor="noVence">
-                          No vence
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col">
-                      <div className="input-group">
-                        <span className="input-group-text">
-                          <Calendar size={18} />
-                        </span>
-                        <input
-                          type="date"
-                          className={`form-control ${formErrors.fechaVencimiento ? "is-invalid" : ""}`}
-                          id="fechaVencimiento"
-                          name="fechaVencimiento"
-                          value={formData.fechaVencimiento}
-                          onChange={handleInputChange}
-                          disabled={formData.noVence}
-                          min={new Date().toISOString().split("T")[0]}
-                        />
-                        {formErrors.fechaVencimiento && (
-                          <div className="invalid-feedback">{formErrors.fechaVencimiento}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Sección de información adicional */}
+                <AdditionalInfoSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  handleInputChange={handleInputChange}
+                  handleScanBarcode={handleScanBarcode}
+                />
               </div>
             </div>
 
@@ -1086,3 +735,4 @@ const RegistrarProducto = () => {
 }
 
 export default RegistrarProducto
+

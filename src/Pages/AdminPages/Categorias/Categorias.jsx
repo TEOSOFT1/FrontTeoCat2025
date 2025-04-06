@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, AlertTriangle } from 'lucide-react'
 import "../../../Styles/AdminStyles/Categorias.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import CategoryForm from "../../../Components/AdminComponents/CategoriasComponents/CategoryForm"
+import DeleteConfirmModal from "../../../Components/AdminComponents/CategoriasComponents/DeleteConfirmModal"
 
 /**
  * Componente para la gestión de categorías de productos
@@ -125,9 +126,7 @@ const CategoriasProducto = () => {
       toastIds.current.error = toast.error(
         <div>
           <strong>Error</strong>
-          <p>
-            No se puede desactivar la categoría "{categoria.nombre}" porque tiene productos asociados.
-          </p>
+          <p>No se puede desactivar la categoría "{categoria.nombre}" porque tiene productos asociados.</p>
         </div>,
         {
           position: "top-right",
@@ -205,9 +204,7 @@ const CategoriasProducto = () => {
       toastIds.current.error = toast.error(
         <div>
           <strong>Error</strong>
-          <p>
-            No se puede eliminar la categoría "{categoria.nombre}" porque tiene productos asociados.
-          </p>
+          <p>No se puede eliminar la categoría "{categoria.nombre}" porque tiene productos asociados.</p>
         </div>,
         {
           position: "top-right",
@@ -333,9 +330,9 @@ const CategoriasProducto = () => {
     } else {
       // Verificar si el nombre ya existe (excepto para la categoría actual en edición)
       const nombreExiste = categorias.some(
-        (cat) => 
-          cat.nombre.toLowerCase() === formData.nombre.trim().toLowerCase() && 
-          (!currentCategoria || cat.id !== currentCategoria.id)
+        (cat) =>
+          cat.nombre.toLowerCase() === formData.nombre.trim().toLowerCase() &&
+          (!currentCategoria || cat.id !== currentCategoria.id),
       )
       if (nombreExiste) {
         errors.nombre = "Ya existe una categoría con este nombre"
@@ -510,116 +507,23 @@ const CategoriasProducto = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Categoría */}
-      <div
-        className="modal fade"
-        id="categoriaModal"
-        tabIndex="-1"
-        aria-labelledby="categoriaModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="categoriaModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="categoria-form">
-                <div className="mb-3">
-                  <label htmlFor="nombre" className="form-label">
-                    Nombre de la Categoría <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${formErrors.nombre ? "is-invalid" : ""}`}
-                    id="nombre"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleInputChange}
-                    disabled={modalTitle === "Ver Detalles de la Categoría"}
-                    maxLength={50}
-                    required
-                  />
-                  {formErrors.nombre && <div className="invalid-feedback">{formErrors.nombre}</div>}
-                  <small className="form-text text-muted">Máximo 50 caracteres.</small>
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="descripcion" className="form-label">
-                    Descripción
-                  </label>
-                  <textarea
-                    className={`form-control ${formErrors.descripcion ? "is-invalid" : ""}`}
-                    id="descripcion"
-                    name="descripcion"
-                    rows="3"
-                    value={formData.descripcion}
-                    onChange={handleInputChange}
-                    disabled={modalTitle === "Ver Detalles de la Categoría"}
-                    maxLength={255}
-                  ></textarea>
-                  {formErrors.descripcion && <div className="invalid-feedback">{formErrors.descripcion}</div>}
-                  <small className="form-text text-muted">Máximo 255 caracteres.</small>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles de la Categoría" && (
-                <button
-                  type="button"
-                  className="btn btn-primary d-flex align-items-center"
-                  onClick={handleSaveCategoria}
-                >
-                  <Save size={18} className="me-1" />
-                  Guardar Categoría
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <CategoryForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        formErrors={formErrors}
+        onInputChange={handleInputChange}
+        onSave={handleSaveCategoria}
+        onClose={handleCloseModal}
+      />
 
       {/* Modal de confirmación para eliminar */}
-      {showDeleteConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showDeleteConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-danger text-white">
-              <h5 className="modal-title">Confirmar eliminación</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={cancelDelete}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-danger me-3" />
-                <p className="mb-0">¿Está seguro de eliminar la categoría "{categoriaToDelete?.nombre}"?</p>
-              </div>
-              <p className="mt-2 text-danger">
-                <strong>Advertencia:</strong> Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        categoria={categoriaToDelete}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
       <ToastContainer
         position="top-right"
@@ -639,3 +543,4 @@ const CategoriasProducto = () => {
 }
 
 export default CategoriasProducto
+

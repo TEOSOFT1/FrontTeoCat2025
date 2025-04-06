@@ -1,13 +1,15 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Save, ArrowLeft, Trash2, Plus, FileText, AlertTriangle } from "lucide-react"
-import Select from "react-select"
+import { Save, ArrowLeft } from "lucide-react"
 import "../../../Styles/AdminStyles/RegistrarCompra.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import CompraForm from "../../../Components/AdminComponents/ComprasComponents/CompraForm"
+import ProductosTable from "../../../Components/AdminComponents/ComprasComponents/ProductosTable"
+import ResumenCompra from "../../../Components/AdminComponents/ComprasComponents/ResumenCompra"
 
 /**
  * Componente para registrar compras de productos
@@ -36,7 +38,7 @@ const RegistrarCompra = () => {
 
   // Estado para el formulario
   const [formData, setFormData] = useState({
-    codigoFactura: "",
+    codigoFactura: generateInvoiceCode(),
     proveedor: null,
     fechaCompra: new Date().toISOString().split("T")[0],
     productosAgregados: [],
@@ -60,46 +62,13 @@ const RegistrarCompra = () => {
    * Función para generar un código de factura único
    * @returns {string} Código de factura generado
    */
-  const generateInvoiceCode = () => {
+  function generateInvoiceCode() {
     const year = new Date().getFullYear()
     const randomNum = Math.floor(Math.random() * 1000)
       .toString()
       .padStart(3, "0")
     return `COMP-${year}-${randomNum}`
   }
-
-  /**
-   * Efecto para cargar datos iniciales
-   * Aquí se implementarán las llamadas a la API con Axios
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      setError(null)
-
-      try {
-        // Aquí se implementaría la carga de datos desde la API
-        // Si es una nueva compra, inicializar con valores por defecto
-        if (!isEditing) {
-          setFormData({
-            codigoFactura: generateInvoiceCode(),
-            proveedor: null,
-            fechaCompra: new Date().toISOString().split("T")[0],
-            productosAgregados: [],
-            productoSeleccionado: null,
-            cantidad: 1,
-          })
-        }
-
-        setProductos([])
-        setProveedores([])
-      } catch (err) {
-        console.error("Error al cargar datos:", err)
-        setError("Error al cargar los datos. Por favor, intente nuevamente.")
-      }
-    }
-
-    fetchData()
-  }, [isEditing, compraId])
 
   /**
    * Función para formatear números con separadores de miles
@@ -514,42 +483,6 @@ const RegistrarCompra = () => {
     navigate("/compras/compras")
   }
 
-  // Definición de columnas para la tabla de productos agregados
-  const productosAgregadosColumns = [
-    { field: "codigoBarras", header: "Código de Barras" },
-    { field: "nombre", header: "Nombre del Producto" },
-    { field: "cantidad", header: "Cantidad" },
-    {
-      field: "precioUnitario",
-      header: "Precio Unitario",
-      render: (row) => `$${formatNumber(row.precioUnitario)}`,
-    },
-    {
-      field: "iva",
-      header: "IVA",
-      render: (row) => `${row.iva}%`,
-    },
-    {
-      field: "subtotal",
-      header: "Subtotal",
-      render: (row) => `$${formatNumber(row.subtotal)}`,
-    },
-    {
-      field: "totalConIVA",
-      header: "Total con IVA",
-      render: (row) => `$${formatNumber(row.totalConIVA)}`,
-    },
-    {
-      field: "acciones",
-      header: "Acciones",
-      render: (row, index) => (
-        <button className="btn btn-sm btn-danger" onClick={() => handleRemoveProduct(index)}>
-          <Trash2 size={16} />
-        </button>
-      ),
-    },
-  ]
-
   // Opciones para el select de productos
   const productosOptions = productos.map((producto) => ({
     value: producto,
@@ -561,23 +494,6 @@ const RegistrarCompra = () => {
     value: proveedor,
     label: `${proveedor.representante} - ${proveedor.documento}`,
   }))
-
-  // Estilos personalizados para react-select
-  const customSelectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(13, 110, 253, 0.25)" : null,
-      "&:hover": {
-        borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? "#0d6efd" : state.isFocused ? "#f8f9fa" : null,
-      color: state.isSelected ? "white" : "black",
-    }),
-  }
 
   return (
     <div className="registrar-compra-container">
@@ -598,189 +514,30 @@ const RegistrarCompra = () => {
         <div className="card">
           <div className="card-body">
             <form className="compra-form">
-              <div className="row mb-3">
-                <div className="col-md-4">
-                  <label htmlFor="codigoFactura" className="form-label">
-                    Código de Factura
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="codigoFactura"
-                    name="codigoFactura"
-                    value={formData.codigoFactura}
-                    readOnly
-                  />
-                  <small className="form-text text-muted">Generado automáticamente</small>
-                </div>
-                <div className="col-md-4">
-                  <label htmlFor="proveedor" className="form-label">
-                    Proveedor <span className="text-danger">*</span>
-                  </label>
-                  <Select
-                    id="proveedor"
-                    name="proveedor"
-                    options={proveedoresOptions}
-                    value={
-                      formData.proveedor
-                        ? proveedoresOptions.find((option) => option.value.id === formData.proveedor.id)
-                        : null
-                    }
-                    onChange={handleSelectProveedor}
-                    placeholder="Seleccione un proveedor..."
-                    styles={customSelectStyles}
-                    isClearable
-                    isSearchable
-                    noOptionsMessage={() => "No se encontraron proveedores"}
-                    className={formErrors.proveedor ? "is-invalid" : ""}
-                  />
-                  {formErrors.proveedor && <div className="invalid-feedback d-block">{formErrors.proveedor}</div>}
-                </div>
-                <div className="col-md-4">
-                  <label htmlFor="fechaCompra" className="form-label">
-                    Fecha de Compra <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    className={`form-control ${formErrors.fechaCompra ? "is-invalid" : ""}`}
-                    id="fechaCompra"
-                    name="fechaCompra"
-                    value={formData.fechaCompra}
-                    onChange={handleInputChange}
-                    required
-                    max={new Date().toISOString().split("T")[0]}
-                  />
-                  {formErrors.fechaCompra && <div className="invalid-feedback">{formErrors.fechaCompra}</div>}
-                  <small className="form-text text-muted">No puede ser una fecha futura</small>
-                </div>
-              </div>
+              {/* Sección de información básica de la compra */}
+              <CompraForm
+                formData={formData}
+                formErrors={formErrors}
+                proveedoresOptions={proveedoresOptions}
+                productosOptions={productosOptions}
+                handleInputChange={handleInputChange}
+                handleSelectProveedor={handleSelectProveedor}
+                handleSelectProduct={handleSelectProduct}
+                handleAddProduct={handleAddProduct}
+              />
 
-              <hr className="my-4" />
+              {/* Tabla de productos agregados */}
+              <ProductosTable
+                productosAgregados={formData.productosAgregados}
+                formErrors={formErrors}
+                formatNumber={formatNumber}
+                handleRemoveProduct={handleRemoveProduct}
+              />
 
-              <h5 className="mb-3">Agregar Productos</h5>
-
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label htmlFor="producto" className="form-label">
-                    Producto <span className="text-danger">*</span>
-                  </label>
-                  <Select
-                    id="producto"
-                    name="producto"
-                    options={productosOptions}
-                    value={
-                      formData.productoSeleccionado
-                        ? productosOptions.find((option) => option.value.id === formData.productoSeleccionado.id)
-                        : null
-                    }
-                    onChange={handleSelectProduct}
-                    placeholder="Seleccione un producto..."
-                    styles={customSelectStyles}
-                    isClearable
-                    isSearchable
-                    noOptionsMessage={() => "No se encontraron productos"}
-                    className={formErrors.productoSeleccionado ? "is-invalid" : ""}
-                  />
-                  {formErrors.productoSeleccionado && (
-                    <div className="invalid-feedback d-block">{formErrors.productoSeleccionado}</div>
-                  )}
-                </div>
-                <div className="col-md-2">
-                  <label htmlFor="cantidad" className="form-label">
-                    Cantidad <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    className={`form-control ${formErrors.cantidad ? "is-invalid" : ""}`}
-                    id="cantidad"
-                    name="cantidad"
-                    value={formData.cantidad}
-                    onChange={handleInputChange}
-                    min="1"
-                    max="1000"
-                    disabled={!formData.productoSeleccionado}
-                  />
-                  {formErrors.cantidad && <div className="invalid-feedback">{formErrors.cantidad}</div>}
-                  <small className="form-text text-muted">Máximo 1000 unidades</small>
-                </div>
-                <div className="col-md-4 d-flex align-items-end">
-                  <button
-                    type="button"
-                    className="btn btn-success ms-auto"
-                    onClick={handleAddProduct}
-                    disabled={!formData.productoSeleccionado}
-                  >
-                    <Plus size={18} className="me-1" />
-                    Agregar
-                  </button>
-                </div>
-              </div>
-
-              {formErrors.productosAgregados && (
-                <div className="alert alert-danger d-flex align-items-center" role="alert">
-                  <AlertTriangle size={18} className="me-2" />
-                  {formErrors.productosAgregados}
-                </div>
-              )}
-
-              <div className="table-responsive mt-4">
-                <table className="table table-striped table-bordered">
-                  <thead className="table-primary">
-                    <tr>
-                      {productosAgregadosColumns.map((column) => (
-                        <th key={column.field}>{column.header}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {formData.productosAgregados.length > 0 ? (
-                      formData.productosAgregados.map((producto, index) => (
-                        <tr key={`${producto.id}-${index}`}>
-                          {productosAgregadosColumns.map((column) => (
-                            <td key={`${producto.id}-${column.field}`}>
-                              {column.render ? column.render(producto, index) : producto[column.field]}
-                            </td>
-                          ))}
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={productosAgregadosColumns.length} className="text-center py-3">
-                          No hay productos agregados
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
+              {/* Resumen de la compra */}
               <div className="row mt-4">
                 <div className="col-md-6">
-                  <div className="card">
-                    <div className="card-header bg-light">
-                      <h5 className="mb-0 d-flex align-items-center">
-                        <FileText size={18} className="me-2" />
-                        Resumen de la Compra
-                      </h5>
-                    </div>
-                    <div className="card-body">
-                      <div className="d-flex justify-content-between mb-2">
-                        <strong>Monto Total:</strong>
-                        <span>${formatNumber(calcularTotales().montoTotal)}</span>
-                      </div>
-                      <div className="d-flex justify-content-between mb-2">
-                        <strong>Total IVA:</strong>
-                        <span>${formatNumber(calcularTotales().totalIVA)}</span>
-                      </div>
-                      <hr />
-                      <div className="d-flex justify-content-between">
-                        <strong>Monto Total con IVA:</strong>
-                        <span className="text-primary fw-bold">
-                          ${formatNumber(calcularTotales().montoTotalConIVA)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <ResumenCompra totales={calcularTotales()} formatNumber={formatNumber} />
                 </div>
               </div>
 

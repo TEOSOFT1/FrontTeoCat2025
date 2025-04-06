@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { ArrowLeft, Trash2, Check } from "lucide-react"
-import Select from "react-select"
+import { ArrowLeft, Check } from "lucide-react"
 import "../../../Styles/AdminStyles/DevolucionVenta.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import VentaInfoSection from "../../../Components/AdminComponents/VentasComponents/VentaInfoSection"
+import ProductoDevolucionForm from "../../../Components/AdminComponents/VentasComponents/ProductoDevolucionForm"
+import DevolucionesTable from "../../../Components/AdminComponents/VentasComponents/DevolucionesTable"
+import ResumenDevolucion from "../../../Components/AdminComponents/VentasComponents/ResumenDevolucion"
 
+/**
+ * Componente para gestionar la devolución de productos de una venta
+ */
 const DevolucionVenta = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -42,6 +48,14 @@ const DevolucionVenta = () => {
     cantidad: 1,
     motivo: null,
     estado: null,
+  })
+
+  // Estado para errores de validación
+  const [formErrors, setFormErrors] = useState({
+    producto: "",
+    cantidad: "",
+    motivo: "",
+    estado: "",
   })
 
   // Función para formatear números con separadores de miles
@@ -152,6 +166,14 @@ const DevolucionVenta = () => {
       ...devolucionActual,
       [name]: value,
     })
+
+    // Limpiar el error específico cuando el usuario comienza a escribir
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: "",
+      })
+    }
   }
 
   // Manejador para seleccionar un producto
@@ -161,6 +183,14 @@ const DevolucionVenta = () => {
       producto: selectedOption ? selectedOption.value : null,
       cantidad: 1, // Resetear cantidad al cambiar de producto
     })
+
+    // Limpiar el error específico
+    if (formErrors.producto) {
+      setFormErrors({
+        ...formErrors,
+        producto: "",
+      })
+    }
   }
 
   // Manejador para seleccionar un motivo
@@ -169,6 +199,14 @@ const DevolucionVenta = () => {
       ...devolucionActual,
       motivo: selectedOption ? selectedOption.value : null,
     })
+
+    // Limpiar el error específico
+    if (formErrors.motivo) {
+      setFormErrors({
+        ...formErrors,
+        motivo: "",
+      })
+    }
   }
 
   // Manejador para seleccionar un estado
@@ -177,102 +215,100 @@ const DevolucionVenta = () => {
       ...devolucionActual,
       estado: selectedOption ? selectedOption.value : null,
     })
+
+    // Limpiar el error específico
+    if (formErrors.estado) {
+      setFormErrors({
+        ...formErrors,
+        estado: "",
+      })
+    }
+  }
+
+  // Manejador para incrementar la cantidad
+  const handleIncrementarCantidad = () => {
+    if (devolucionActual.producto && devolucionActual.cantidad < devolucionActual.producto.cantidad) {
+      setDevolucionActual({
+        ...devolucionActual,
+        cantidad: devolucionActual.cantidad + 1,
+      })
+    }
+  }
+
+  // Manejador para decrementar la cantidad
+  const handleDecrementarCantidad = () => {
+    if (devolucionActual.cantidad > 1) {
+      setDevolucionActual({
+        ...devolucionActual,
+        cantidad: devolucionActual.cantidad - 1,
+      })
+    }
+  }
+
+  // Validar el formulario de devolución
+  const validateDevolucionForm = () => {
+    let isValid = true
+    const errors = {
+      producto: "",
+      cantidad: "",
+      motivo: "",
+      estado: "",
+    }
+
+    // Validar producto
+    if (!devolucionActual.producto) {
+      errors.producto = "Por favor, seleccione un producto"
+      isValid = false
+    }
+
+    // Validar cantidad
+    if (!devolucionActual.cantidad || devolucionActual.cantidad <= 0) {
+      errors.cantidad = "Por favor, ingrese una cantidad válida"
+      isValid = false
+    } else if (devolucionActual.producto && devolucionActual.cantidad > devolucionActual.producto.cantidad) {
+      errors.cantidad = "La cantidad a devolver no puede ser mayor que la cantidad comprada"
+      isValid = false
+    }
+
+    // Validar motivo
+    if (!devolucionActual.motivo) {
+      errors.motivo = "Por favor, seleccione un motivo de devolución"
+      isValid = false
+    }
+
+    // Validar estado
+    if (!devolucionActual.estado) {
+      errors.estado = "Por favor, seleccione un estado para la devolución"
+      isValid = false
+    }
+
+    setFormErrors(errors)
+    return isValid
   }
 
   // Manejador para agregar una devolución
   const handleAgregarDevolucion = () => {
+    // Validar el formulario
+    if (!validateDevolucionForm()) {
+      // Mostrar notificación de error general
+      toast.error(
+        <div>
+          <strong>Error</strong>
+          <p>Por favor, corrija los errores en el formulario.</p>
+        </div>,
+        {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        },
+      )
+      return
+    }
+
     const { producto, cantidad, motivo, estado } = devolucionActual
-
-    // Validaciones
-    if (!producto) {
-      toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>Por favor, seleccione un producto.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
-    }
-
-    if (!cantidad || cantidad <= 0) {
-      toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>Por favor, ingrese una cantidad válida.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
-    }
-
-    if (cantidad > producto.cantidad) {
-      toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>La cantidad a devolver no puede ser mayor que la cantidad comprada.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
-    }
-
-    if (!motivo) {
-      toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>Por favor, seleccione un motivo de devolución.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
-    }
-
-    if (!estado) {
-      toast.error(
-        <div>
-          <strong>Error</strong>
-          <p>Por favor, seleccione un estado para la devolución.</p>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        },
-      )
-      return
-    }
 
     // Verificar si el producto ya está en la lista de devoluciones
     const productoExistente = devoluciones.findIndex((d) => d.producto.id === producto.id)
@@ -430,23 +466,6 @@ const DevolucionVenta = () => {
     label: estado.nombre,
   }))
 
-  // Estilos personalizados para react-select
-  const customSelectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(13, 110, 253, 0.25)" : null,
-      "&:hover": {
-        borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? "#0d6efd" : state.isFocused ? "#f8f9fa" : null,
-      color: state.isSelected ? "white" : "black",
-    }),
-  }
-
   if (!venta) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
@@ -467,211 +486,34 @@ const DevolucionVenta = () => {
         </button>
       </div>
 
-      <div className="card mb-4">
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-3">
-              <label className="form-label">Nombre del Cliente</label>
-              <input type="text" className="form-control" value={venta.cliente.nombre} readOnly />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Fecha de Venta</label>
-              <input type="date" className="form-control" value={venta.fechaVenta} readOnly />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Número de Factura</label>
-              <input type="text" className="form-control" value={venta.codigoFactura} readOnly />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Total de la Venta</label>
-              <input type="text" className="form-control" value={`$${formatNumber(venta.total)}`} readOnly />
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Sección de información de la venta */}
+      <VentaInfoSection venta={venta} formatNumber={formatNumber} />
 
-      <div className="card mb-4">
-        <div className="card-header bg-light">
-          <h5 className="mb-0">Agregar Producto a Devolver</h5>
-        </div>
-        <div className="card-body">
-          <div className="row mb-3">
-            <div className="col-md-4">
-              <label className="form-label">Seleccionar Producto</label>
-              <Select
-                options={productosOptions}
-                value={
-                  devolucionActual.producto
-                    ? productosOptions.find((option) => option.value.id === devolucionActual.producto.id)
-                    : null
-                }
-                onChange={handleSelectProducto}
-                placeholder="Seleccione un producto..."
-                styles={customSelectStyles}
-                isClearable
-                isSearchable
-                noOptionsMessage={() => "No hay productos disponibles"}
-              />
-            </div>
-            <div className="col-md-2">
-              <label className="form-label">Cantidad</label>
-              <div className="input-group">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => {
-                    if (devolucionActual.cantidad > 1) {
-                      setDevolucionActual({
-                        ...devolucionActual,
-                        cantidad: devolucionActual.cantidad - 1,
-                      })
-                    }
-                  }}
-                  disabled={!devolucionActual.producto}
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  className="form-control text-center"
-                  name="cantidad"
-                  value={devolucionActual.cantidad}
-                  onChange={handleInputChange}
-                  min="1"
-                  max={devolucionActual.producto ? devolucionActual.producto.cantidad : 1}
-                  disabled={!devolucionActual.producto}
-                />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => {
-                    if (devolucionActual.producto && devolucionActual.cantidad < devolucionActual.producto.cantidad) {
-                      setDevolucionActual({
-                        ...devolucionActual,
-                        cantidad: devolucionActual.cantidad + 1,
-                      })
-                    }
-                  }}
-                  disabled={!devolucionActual.producto}
-                >
-                  +
-                </button>
-              </div>
-              {devolucionActual.producto && (
-                <small className="text-muted">Original: {devolucionActual.producto.cantidad}</small>
-              )}
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Motivo</label>
-              <Select
-                options={motivosOptions}
-                value={
-                  devolucionActual.motivo
-                    ? motivosOptions.find((option) => option.value.id === devolucionActual.motivo.id)
-                    : null
-                }
-                onChange={handleSelectMotivo}
-                placeholder="Seleccione un motivo..."
-                styles={customSelectStyles}
-                isClearable
-                isSearchable
-                noOptionsMessage={() => "No hay motivos disponibles"}
-              />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Estado</label>
-              <Select
-                options={estadosOptions}
-                value={
-                  devolucionActual.estado
-                    ? estadosOptions.find((option) => option.value.id === devolucionActual.estado.id)
-                    : null
-                }
-                onChange={handleSelectEstado}
-                placeholder="Seleccione un estado..."
-                styles={customSelectStyles}
-                isClearable
-                isSearchable
-                noOptionsMessage={() => "No hay estados disponibles"}
-              />
-            </div>
-          </div>
-          <div className="d-flex justify-content-end">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleAgregarDevolucion}
-              disabled={
-                !devolucionActual.producto ||
-                !devolucionActual.motivo ||
-                !devolucionActual.estado ||
-                devolucionActual.cantidad <= 0
-              }
-            >
-              Agregar Devolución
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Formulario para agregar productos a devolver */}
+      <ProductoDevolucionForm
+        devolucionActual={devolucionActual}
+        formErrors={formErrors}
+        productosOptions={productosOptions}
+        motivosOptions={motivosOptions}
+        estadosOptions={estadosOptions}
+        handleSelectProducto={handleSelectProducto}
+        handleInputChange={handleInputChange}
+        handleIncrementarCantidad={handleIncrementarCantidad}
+        handleDecrementarCantidad={handleDecrementarCantidad}
+        handleSelectMotivo={handleSelectMotivo}
+        handleSelectEstado={handleSelectEstado}
+        handleAgregarDevolucion={handleAgregarDevolucion}
+      />
 
-      <div className="card mb-4">
-        <div className="card-header bg-light">
-          <h5 className="mb-0">Lista de Devoluciones</h5>
-        </div>
-        <div className="card-body">
-          <div className="table-responsive">
-            <table className="table table-striped table-bordered">
-              <thead className="table-primary">
-                <tr>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>Subtotal</th>
-                  <th>Motivo de Devolución</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {devoluciones.length > 0 ? (
-                  devoluciones.map((devolucion) => (
-                    <tr key={devolucion.id}>
-                      <td>{devolucion.producto.nombre}</td>
-                      <td>{devolucion.cantidad}</td>
-                      <td>${formatNumber(devolucion.subtotal)}</td>
-                      <td>{devolucion.motivo.nombre}</td>
-                      <td>
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => handleEliminarDevolucion(devolucion.id)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center py-3">
-                      No hay devoluciones agregadas
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      {/* Tabla de devoluciones */}
+      <DevolucionesTable
+        devoluciones={devoluciones}
+        formatNumber={formatNumber}
+        handleEliminarDevolucion={handleEliminarDevolucion}
+      />
 
-      <div className="card mb-4">
-        <div className="card-header bg-light">
-          <h5 className="mb-0">Resumen</h5>
-        </div>
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center">
-            <h4>Monto Total de Devolución:</h4>
-            <h4 className="text-primary">${formatNumber(calcularMontoTotalDevolucion())}</h4>
-          </div>
-        </div>
-      </div>
+      {/* Resumen de la devolución */}
+      <ResumenDevolucion montoTotal={calcularMontoTotalDevolucion()} formatNumber={formatNumber} />
 
       <div className="d-flex justify-content-end mt-4">
         <button type="button" className="btn btn-secondary me-2" onClick={handleCancel}>

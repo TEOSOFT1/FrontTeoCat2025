@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, AlertTriangle } from "lucide-react"
 import "../../../Styles/AdminStyles/Clientes.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
-import Select from "react-select"
+import ClienteForm from "../../../Components/AdminComponents/ClientesComponents/ClienteForm"
+import DeleteConfirmModal from "../../../Components/AdminComponents/ClientesComponents/DeleteConfirmModal"
 
 /**
  * Componente para la gestión de clientes
@@ -37,8 +37,8 @@ const Clientes = () => {
     mascotas: [],
   })
 
-  // Add a new state for validation errors
-  const [errors, setErrors] = useState({
+  // Estado para errores de validación
+  const [formErrors, setFormErrors] = useState({
     documento: "",
     correo: "",
     nombre: "",
@@ -112,6 +112,16 @@ const Clientes = () => {
       mascotas: cliente.mascotas,
     })
 
+    // Resetear errores
+    setFormErrors({
+      documento: "",
+      correo: "",
+      nombre: "",
+      apellido: "",
+      direccion: "",
+      telefono: "",
+    })
+
     setShowModal(true)
   }
 
@@ -132,6 +142,16 @@ const Clientes = () => {
       direccion: cliente.direccion,
       telefono: cliente.telefono,
       mascotas: cliente.mascotas,
+    })
+
+    // Resetear errores
+    setFormErrors({
+      documento: "",
+      correo: "",
+      nombre: "",
+      apellido: "",
+      direccion: "",
+      telefono: "",
     })
 
     setShowModal(true)
@@ -269,6 +289,16 @@ const Clientes = () => {
       mascotas: [],
     })
 
+    // Resetear errores
+    setFormErrors({
+      documento: "",
+      correo: "",
+      nombre: "",
+      apellido: "",
+      direccion: "",
+      telefono: "",
+    })
+
     setShowModal(true)
   }
 
@@ -290,10 +320,10 @@ const Clientes = () => {
       [name]: value,
     })
 
-    // Clear the error for this field when user types
-    if (errors[name]) {
-      setErrors({
-        ...errors,
+    // Limpiar el error específico cuando el usuario comienza a escribir
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
         [name]: "",
       })
     }
@@ -311,12 +341,12 @@ const Clientes = () => {
   }
 
   /**
-   * Manejador para guardar el cliente (crear nuevo o actualizar existente)
-   * Valida los datos y envía la información
+   * Validar el formulario completo
+   * @returns {boolean} - True si el formulario es válido, false en caso contrario
    */
-  const handleSaveCliente = () => {
-    // Reset all errors
-    const newErrors = {
+  const validateForm = () => {
+    let isValid = true
+    const errors = {
       documento: "",
       correo: "",
       nombre: "",
@@ -325,80 +355,100 @@ const Clientes = () => {
       telefono: "",
     }
 
-    let isValid = true
-
-    // Validate required fields
+    // Validar documento (requerido y formato)
     if (!formData.documento.trim()) {
-      newErrors.documento = "El documento es obligatorio"
+      errors.documento = "El documento es obligatorio"
       isValid = false
+    } else if (!/^\d{7,12}$/.test(formData.documento)) {
+      errors.documento = "El documento debe tener entre 7 y 12 dígitos"
+      isValid = false
+    } else {
+      // Verificar si el documento ya existe (excepto para el cliente actual en edición)
+      const documentoExiste = clientes.some(
+        (c) => c.documento === formData.documento && (!currentCliente || c.id !== currentCliente.id),
+      )
+      if (documentoExiste) {
+        errors.documento = "Este documento ya está registrado"
+        isValid = false
+      }
     }
 
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = "El nombre es obligatorio"
+    // Validar correo (requerido y formato)
+    if (!formData.correo.trim()) {
+      errors.correo = "El correo es obligatorio"
       isValid = false
-    }
-
-    if (!formData.apellido.trim()) {
-      newErrors.apellido = "El apellido es obligatorio"
-      isValid = false
-    }
-
-    if (!formData.direccion.trim()) {
-      newErrors.direccion = "La dirección es obligatoria"
-      isValid = false
-    }
-
-    if (!formData.telefono.trim()) {
-      newErrors.telefono = "El teléfono es obligatorio"
-      isValid = false
-    }
-
-    // Validate email format if provided
-    if (formData.correo.trim()) {
+    } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(formData.correo)) {
-        newErrors.correo = "El formato del correo electrónico no es válido"
+        errors.correo = "Formato de correo inválido"
         isValid = false
+      } else {
+        // Verificar si el correo ya existe (excepto para el cliente actual en edición)
+        const correoExiste = clientes.some(
+          (c) => c.correo === formData.correo && (!currentCliente || c.id !== currentCliente.id),
+        )
+        if (correoExiste) {
+          errors.correo = "Este correo ya está registrado"
+          isValid = false
+        }
       }
-    } else {
-      newErrors.correo = "El correo electrónico es obligatorio"
+    }
+
+    // Validar nombre (requerido)
+    if (!formData.nombre.trim()) {
+      errors.nombre = "El nombre es obligatorio"
+      isValid = false
+    } else if (formData.nombre.trim().length > 50) {
+      errors.nombre = "El nombre no puede exceder los 50 caracteres"
       isValid = false
     }
 
-    // Check for duplicate documento (in a real app, this would be an API call)
-    if (formData.documento.trim() && currentCliente?.documento !== formData.documento) {
-      const documentoExists = clientes.some(
-        (c) => c.documento === formData.documento && c.id !== (currentCliente?.id || 0),
-      )
-
-      if (documentoExists) {
-        newErrors.documento = "Este documento ya está registrado"
-        isValid = false
-      }
+    // Validar apellido (requerido)
+    if (!formData.apellido.trim()) {
+      errors.apellido = "El apellido es obligatorio"
+      isValid = false
+    } else if (formData.apellido.trim().length > 50) {
+      errors.apellido = "El apellido no puede exceder los 50 caracteres"
+      isValid = false
     }
 
-    // Check for duplicate email (in a real app, this would be an API call)
-    if (formData.correo.trim() && currentCliente?.correo !== formData.correo) {
-      const correoExists = clientes.some((c) => c.correo === formData.correo && c.id !== (currentCliente?.id || 0))
-
-      if (correoExists) {
-        newErrors.correo = "Este correo electrónico ya está registrado"
-        isValid = false
-      }
+    // Validar teléfono (requerido y formato)
+    if (!formData.telefono.trim()) {
+      errors.telefono = "El teléfono es obligatorio"
+      isValid = false
+    } else if (!/^\d{7,10}$/.test(formData.telefono)) {
+      errors.telefono = "El teléfono debe tener entre 7 y 10 dígitos"
+      isValid = false
     }
 
-    // Update errors state
-    setErrors(newErrors)
+    // Validar dirección (requerida)
+    if (!formData.direccion.trim()) {
+      errors.direccion = "La dirección es obligatoria"
+      isValid = false
+    } else if (formData.direccion.trim().length > 100) {
+      errors.direccion = "La dirección no puede exceder los 100 caracteres"
+      isValid = false
+    }
 
-    // If there are validation errors, show toast and return
-    if (!isValid) {
+    setFormErrors(errors)
+    return isValid
+  }
+
+  /**
+   * Manejador para guardar el cliente (crear nuevo o actualizar existente)
+   * Valida los datos y envía la información
+   */
+  const handleSaveCliente = () => {
+    // Validar el formulario
+    if (!validateForm()) {
+      // Mostrar notificación de error general
       if (toastIds.current.error) {
         toast.dismiss(toastIds.current.error)
       }
 
       toastIds.current.error = toast.error(
         <div>
-          <strong>Error de validación</strong>
+          <strong>Error</strong>
           <p>Por favor, corrija los errores en el formulario.</p>
         </div>,
         {
@@ -507,23 +557,6 @@ const Clientes = () => {
     label: mascota.nombre,
   }))
 
-  // Estilos personalizados para react-select
-  const customSelectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(13, 110, 253, 0.25)" : null,
-      "&:hover": {
-        borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? "#0d6efd" : state.isFocused ? "#f8f9fa" : null,
-      color: state.isSelected ? "white" : "black",
-    }),
-  }
-
   /**
    * Efecto para inicializar el modal de Bootstrap
    */
@@ -551,14 +584,6 @@ const Clientes = () => {
     // Evento para cuando el modal se cierra con el botón X o haciendo clic fuera
     const handleHidden = () => {
       setShowModal(false)
-      // Asegurarse de que se elimine cualquier backdrop residual
-      const backdrop = document.querySelector(".modal-backdrop")
-      if (backdrop) {
-        backdrop.remove()
-      }
-      document.body.classList.remove("modal-open")
-      document.body.style.overflow = ""
-      document.body.style.paddingRight = ""
     }
 
     modalElement?.addEventListener("hidden.bs.modal", handleHidden)
@@ -589,205 +614,25 @@ const Clientes = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Cliente */}
-      <div
-        className="modal fade"
-        id="clienteModal"
-        tabIndex="-1"
-        aria-labelledby="clienteModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="clienteModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="cliente-form">
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="documento" className="form-label">
-                      Documento <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.documento ? "is-invalid" : ""}`}
-                      id="documento"
-                      name="documento"
-                      value={formData.documento}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.documento && <div className="invalid-feedback">{errors.documento}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="correo" className="form-label">
-                      Correo Electrónico <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className={`form-control ${errors.correo ? "is-invalid" : ""}`}
-                      id="correo"
-                      name="correo"
-                      value={formData.correo}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.correo && <div className="invalid-feedback">{errors.correo}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="nombre" className="form-label">
-                      Nombre <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
-                      id="nombre"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="apellido" className="form-label">
-                      Apellido <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.apellido ? "is-invalid" : ""}`}
-                      id="apellido"
-                      name="apellido"
-                      value={formData.apellido}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.apellido && <div className="invalid-feedback">{errors.apellido}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="telefono" className="form-label">
-                      Teléfono <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      className={`form-control ${errors.telefono ? "is-invalid" : ""}`}
-                      id="telefono"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.telefono && <div className="invalid-feedback">{errors.telefono}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="direccion" className="form-label">
-                      Dirección <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.direccion ? "is-invalid" : ""}`}
-                      id="direccion"
-                      name="direccion"
-                      value={formData.direccion}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Cliente"}
-                      required
-                    />
-                    {errors.direccion && <div className="invalid-feedback">{errors.direccion}</div>}
-                  </div>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-12">
-                    <label htmlFor="mascotas" className="form-label">
-                      Mascotas
-                    </label>
-                    <Select
-                      id="mascotas"
-                      name="mascotas"
-                      options={mascotasOptions}
-                      value={
-                        formData.mascotas
-                          ? mascotasOptions.filter((option) =>
-                              formData.mascotas.some((mascota) => mascota.id === option.value.id),
-                            )
-                          : []
-                      }
-                      onChange={handleSelectMascotas}
-                      placeholder="Seleccione mascotas..."
-                      isDisabled={modalTitle === "Ver Detalles del Cliente"}
-                      styles={customSelectStyles}
-                      isMulti
-                      isClearable
-                      isSearchable
-                      noOptionsMessage={() => "No se encontraron mascotas"}
-                    />
-                    <small className="text-muted">Puede seleccionar múltiples mascotas para este cliente.</small>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles del Cliente" && (
-                <button type="button" className="btn btn-primary d-flex align-items-center" onClick={handleSaveCliente}>
-                  <Save size={18} className="me-1" />
-                  Guardar Cliente
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ClienteForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        formErrors={formErrors}
+        mascotasOptions={mascotasOptions}
+        handleInputChange={handleInputChange}
+        handleSelectMascotas={handleSelectMascotas}
+        handleSaveCliente={handleSaveCliente}
+        handleCloseModal={handleCloseModal}
+      />
 
       {/* Modal de confirmación para eliminar */}
-      {showDeleteConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showDeleteConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-danger text-white">
-              <h5 className="modal-title">Confirmar eliminación</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={cancelDelete}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-danger me-3" />
-                <p className="mb-0">¿Está seguro de eliminar el cliente "{clienteToDelete?.nombreCompleto}"?</p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        cliente={clienteToDelete}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
       <ToastContainer
         position="top-right"

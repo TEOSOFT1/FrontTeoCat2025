@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, AlertTriangle, PawPrint, Upload } from "lucide-react"
 import "../../../Styles/AdminStyles/Mascotas.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import MascotaForm from "../../../Components/AdminComponents/MascotasComponents/MascotaForm"
+import DeleteConfirmModal from "../../../Components/AdminComponents/MascotasComponents/DeleteConfirmModal"
 
 /**
  * Componente para la gestión de mascotas
@@ -451,23 +452,6 @@ const Mascotas = () => {
     { value: "Grande", label: "Grande" },
   ]
 
-  // Estilos personalizados para react-select
-  const customSelectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(13, 110, 253, 0.25)" : null,
-      "&:hover": {
-        borderColor: state.isFocused ? "#86b7fe" : "#ced4da",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? "#0d6efd" : state.isFocused ? "#f8f9fa" : null,
-      color: state.isSelected ? "white" : "black",
-    }),
-  }
-
   /**
    * Efecto para inicializar el modal de Bootstrap
    */
@@ -518,209 +502,28 @@ const Mascotas = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Mascota */}
-      <div
-        className="modal fade"
-        id="mascotaModal"
-        tabIndex="-1"
-        aria-labelledby="mascotaModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="mascotaModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="mascota-form">
-                <div className="row mb-3">
-                  <div className="col-md-12">
-                    <label htmlFor="nombre" className="form-label">
-                      Nombre de la Mascota <span className="text-danger">*</span>
-                    </label>
-                    <div className="input-group">
-                      <span className="input-group-text">
-                        <PawPrint size={18} />
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="nombre"
-                        name="nombre"
-                        value={formData.nombre}
-                        onChange={handleInputChange}
-                        disabled={modalTitle === "Ver Detalles de la Mascota"}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="especie" className="form-label">
-                      Especie <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className="form-select"
-                      id="especie"
-                      name="especie"
-                      value={formData.especie}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles de la Mascota"}
-                      required
-                    >
-                      <option value="">Seleccione una especie</option>
-                      {especiesOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="raza" className="form-label">
-                      Raza
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="raza"
-                      name="raza"
-                      value={formData.raza}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles de la Mascota"}
-                    />
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="tamaño" className="form-label">
-                      Tamaño
-                    </label>
-                    <select
-                      className="form-select"
-                      id="tamaño"
-                      name="tamaño"
-                      value={formData.tamaño}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles de la Mascota"}
-                    >
-                      <option value="">Seleccione un tamaño</option>
-                      {tamañosOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="fechaNacimiento" className="form-label">
-                      Fecha de Nacimiento <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      id="fechaNacimiento"
-                      name="fechaNacimiento"
-                      value={formData.fechaNacimiento}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles de la Mascota"}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Nuevo campo para subir foto */}
-                <div className="row mb-3">
-                  <div className="col-12">
-                    <label htmlFor="foto" className="form-label">
-                      Foto de la Mascota
-                    </label>
-                    <div className="d-flex gap-3 align-items-center">
-                      <div className="flex-grow-1">
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <Upload size={18} />
-                          </span>
-                          <input
-                            type="file"
-                            className="form-control"
-                            id="foto"
-                            name="foto"
-                            accept="image/*"
-                            onChange={handleFotoChange}
-                            disabled={modalTitle === "Ver Detalles de la Mascota"}
-                          />
-                        </div>
-                        <small className="text-muted">Formatos aceptados: JPG, PNG, GIF. Máximo 5MB.</small>
-                      </div>
-                      {fotoPreview && (
-                        <div className="flex-shrink-0">
-                          <img
-                            src={fotoPreview || "/placeholder.svg"}
-                            alt="Vista previa"
-                            className="img-thumbnail"
-                            style={{ width: "100px", height: "100px", objectFit: "cover" }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles de la Mascota" && (
-                <button type="button" className="btn btn-primary d-flex align-items-center" onClick={handleSaveMascota}>
-                  <Save size={18} className="me-1" />
-                  Guardar Mascota
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <MascotaForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        fotoPreview={fotoPreview}
+        especiesOptions={especiesOptions}
+        tamañosOptions={tamañosOptions}
+        clientesOptions={clientesOptions}
+        onInputChange={handleInputChange}
+        onSelectCliente={handleSelectCliente}
+        onFotoChange={handleFotoChange}
+        onSave={handleSaveMascota}
+        onClose={handleCloseModal}
+      />
 
       {/* Modal de confirmación para eliminar */}
-      {showDeleteConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showDeleteConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-danger text-white">
-              <h5 className="modal-title">Confirmar eliminación</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={cancelDelete}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-danger me-3" />
-                <p className="mb-0">¿Está seguro de eliminar la mascota "{mascotaToDelete?.nombre}"?</p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        mascota={mascotaToDelete}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
       <ToastContainer
         position="top-right"

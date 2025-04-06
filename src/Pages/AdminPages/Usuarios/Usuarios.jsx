@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import "../../../Styles/AdminStyles/Usuarios.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import UserForm from "../../../Components/AdminComponents/UsuariosComponents/UserForm"
+import StatusConfirmModal from "../../../Components/AdminComponents/UsuariosComponents/StatusConfirmModal"
 
 /**
  * Componente para la gestión de usuarios
@@ -51,14 +52,6 @@ const Usuarios = () => {
     contrasena: "",
     confirmarContrasena: "",
   })
-
-  // Estado para mostrar/ocultar contraseña
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  // Estado para el modal de confirmación de eliminación
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [userToDelete, setUserToDelete] = useState(null)
 
   // Estado para el modal de confirmación de cambio de estado
   const [showStatusConfirm, setShowStatusConfirm] = useState(false)
@@ -367,7 +360,7 @@ const Usuarios = () => {
     } else {
       // Verificar si el documento ya existe (excepto para el usuario actual en edición)
       const documentoExiste = usuarios.some(
-        (user) => user.documento === formData.documento && (!currentUser || user.id !== currentUser.id)
+        (user) => user.documento === formData.documento && (!currentUser || user.id !== currentUser.id),
       )
       if (documentoExiste) {
         errors.documento = "Este documento ya está registrado"
@@ -387,7 +380,7 @@ const Usuarios = () => {
       } else {
         // Verificar si el correo ya existe (excepto para el usuario actual en edición)
         const correoExiste = usuarios.some(
-          (user) => user.correo === formData.correo && (!currentUser || user.id !== currentUser.id)
+          (user) => user.correo === formData.correo && (!currentUser || user.id !== currentUser.id),
         )
         if (correoExiste) {
           errors.correo = "Este correo ya está registrado"
@@ -652,308 +645,25 @@ const Usuarios = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Usuario */}
-      <div className="modal fade" id="userModal" tabIndex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="userModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="user-form">
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="documento" className="form-label">
-                      Documento <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.documento ? "is-invalid" : ""}`}
-                      id="documento"
-                      name="documento"
-                      value={formData.documento}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.documento && <div className="invalid-feedback">{formErrors.documento}</div>}
-                    <small className="form-text text-muted">Ingrese entre 7 y 12 dígitos sin puntos ni espacios.</small>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="correo" className="form-label">
-                      Correo Electrónico <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className={`form-control ${formErrors.correo ? "is-invalid" : ""}`}
-                      id="correo"
-                      name="correo"
-                      value={formData.correo}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.correo && <div className="invalid-feedback">{formErrors.correo}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="nombre" className="form-label">
-                      Nombre <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.nombre ? "is-invalid" : ""}`}
-                      id="nombre"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.nombre && <div className="invalid-feedback">{formErrors.nombre}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="apellido" className="form-label">
-                      Apellido <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.apellido ? "is-invalid" : ""}`}
-                      id="apellido"
-                      name="apellido"
-                      value={formData.apellido}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.apellido && <div className="invalid-feedback">{formErrors.apellido}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="telefono" className="form-label">
-                      Teléfono <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      className={`form-control ${formErrors.telefono ? "is-invalid" : ""}`}
-                      id="telefono"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.telefono && <div className="invalid-feedback">{formErrors.telefono}</div>}
-                    <small className="form-text text-muted">Ingrese entre 7 y 10 dígitos sin espacios.</small>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="direccion" className="form-label">
-                      Dirección <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.direccion ? "is-invalid" : ""}`}
-                      id="direccion"
-                      name="direccion"
-                      value={formData.direccion}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    />
-                    {formErrors.direccion && <div className="invalid-feedback">{formErrors.direccion}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="foto" className="form-label">
-                      Foto
-                    </label>
-                    <input
-                      type="file"
-                      className="form-control"
-                      id="foto"
-                      name="foto"
-                      onChange={(e) => {
-                        // Handle file upload
-                        const file = e.target.files[0]
-                        if (file) {
-                          setFormData({
-                            ...formData,
-                            foto: file,
-                          })
-                        }
-                      }}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      accept="image/*"
-                    />
-                    {formData.foto && typeof formData.foto === "object" && (
-                      <small className="form-text text-success">Archivo seleccionado: {formData.foto.name}</small>
-                    )}
-                    {formData.foto && typeof formData.foto === "string" && formData.foto.trim() !== "" && (
-                      <div className="mt-2">
-                        <img
-                          src={formData.foto || "/placeholder.svg"}
-                          alt="Vista previa"
-                          style={{ maxWidth: "100%", maxHeight: "100px" }}
-                          className="img-thumbnail"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="rol" className="form-label">
-                      Rol <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className={`form-select ${formErrors.rol ? "is-invalid" : ""}`}
-                      id="rol"
-                      name="rol"
-                      value={formData.rol}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Usuario"}
-                      required
-                    >
-                      <option value="">Seleccione un rol</option>
-                      {roles.map((rol) => (
-                        <option key={rol.id} value={rol.nombre}>
-                          {rol.nombre}
-                        </option>
-                      ))}
-                    </select>
-                    {formErrors.rol && <div className="invalid-feedback">{formErrors.rol}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="contrasena" className="form-label">
-                      Contraseña {!currentUser && <span className="text-danger">*</span>}
-                    </label>
-                    <div className="input-group">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        className={`form-control ${formErrors.contrasena ? "is-invalid" : ""}`}
-                        id="contrasena"
-                        name="contrasena"
-                        value={formData.contrasena}
-                        onChange={handleInputChange}
-                        disabled={modalTitle === "Ver Detalles del Usuario"}
-                        required={!currentUser}
-                      />
-                      <button
-                        className="btn btn-outline-secondary"
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={modalTitle === "Ver Detalles del Usuario"}
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                    {formErrors.contrasena && <div className="invalid-feedback">{formErrors.contrasena}</div>}
-                    {currentUser && modalTitle !== "Ver Detalles del Usuario" && (
-                      <small className="form-text text-muted">
-                        Dejar en blanco para mantener la contraseña actual.
-                      </small>
-                    )}
-                    {!currentUser && (
-                      <small className="form-text text-muted">
-                        La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
-                      </small>
-                    )}
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="confirmarContrasena" className="form-label">
-                      Confirmar Contraseña {!currentUser && <span className="text-danger">*</span>}
-                    </label>
-                    <div className="input-group">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        className={`form-control ${formErrors.confirmarContrasena ? "is-invalid" : ""}`}
-                        id="confirmarContrasena"
-                        name="confirmarContrasena"
-                        value={formData.confirmarContrasena}
-                        onChange={handleInputChange}
-                        disabled={modalTitle === "Ver Detalles del Usuario"}
-                        required={!currentUser}
-                      />
-                      <button
-                        className="btn btn-outline-secondary"
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        disabled={modalTitle === "Ver Detalles del Usuario"}
-                      >
-                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                    {formErrors.confirmarContrasena && (
-                      <div className="invalid-feedback">{formErrors.confirmarContrasena}</div>
-                    )}
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles del Usuario" && (
-                <button type="button" className="btn btn-primary d-flex align-items-center" onClick={handleSaveUser}>
-                  <Save size={18} className="me-1" />
-                  Guardar Usuario
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <UserForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        formErrors={formErrors}
+        roles={roles}
+        currentUser={currentUser}
+        onInputChange={handleInputChange}
+        onSave={handleSaveUser}
+        onClose={handleCloseModal}
+      />
 
       {/* Modal de confirmación para cambio de estado */}
-      {showStatusConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showStatusConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-warning text-white">
-              <h5 className="modal-title">Confirmar cambio de estado</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={handleCancelToggleStatus}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-warning me-3" />
-                <p className="mb-0">
-                  ¿Está seguro de {userToToggle?.estado === "Activo" ? "desactivar" : "activar"} al usuario "
-                  {userToToggle?.nombre}"?
-                </p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={handleCancelToggleStatus}>
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className={`btn ${userToToggle?.estado === "Activo" ? "btn-danger" : "btn-success"}`}
-                onClick={handleToggleStatus}
-              >
-                {userToToggle?.estado === "Activo" ? "Desactivar" : "Activar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatusConfirmModal
+        show={showStatusConfirm}
+        user={userToToggle}
+        onConfirm={handleToggleStatus}
+        onCancel={handleCancelToggleStatus}
+      />
 
       <ToastContainer
         position="top-right"
@@ -973,3 +683,4 @@ const Usuarios = () => {
 }
 
 export default Usuarios
+

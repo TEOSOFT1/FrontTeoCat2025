@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, AlertTriangle } from "lucide-react"
 import "../../../Styles/AdminStyles/TiposServicios.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import TipoServicioForm from "../../../Components/AdminComponents/TiposDeServicioComponents/TipoServicioForm"
+import DeleteConfirmModal from "../../../Components/AdminComponents/TiposDeServicioComponents/DeleteConfirmModal"
 
 /**
  * Componente para la gestión de tipos de servicios
@@ -29,8 +30,9 @@ const TiposServicios = () => {
   })
 
   // Estado para los errores de validación
-  const [errors, setErrors] = useState({
+  const [formErrors, setFormErrors] = useState({
     nombre: "",
+    descripcion: "",
   })
 
   // Estado para el modal de confirmación de eliminación
@@ -44,7 +46,9 @@ const TiposServicios = () => {
    * Efecto para cargar datos iniciales
    * Aquí se implementarán las llamadas a la API para obtener tipos de servicios
    */
-  
+  useEffect(() => {
+    // Aquí se implementará la carga de datos desde la API
+  }, [])
 
   // Definición de columnas para la tabla
   const columns = [
@@ -89,6 +93,12 @@ const TiposServicios = () => {
       descripcion: tipoServicio.descripcion,
     })
 
+    // Resetear errores
+    setFormErrors({
+      nombre: "",
+      descripcion: "",
+    })
+
     setShowModal(true)
   }
 
@@ -104,6 +114,12 @@ const TiposServicios = () => {
     setFormData({
       nombre: tipoServicio.nombre,
       descripcion: tipoServicio.descripcion,
+    })
+
+    // Resetear errores
+    setFormErrors({
+      nombre: "",
+      descripcion: "",
     })
 
     setShowModal(true)
@@ -130,7 +146,12 @@ const TiposServicios = () => {
     // Añadir notificación
     const newStatus = tipoServicio.estado === "Activo" ? "inactivo" : "activo"
 
-    toast.success(
+    // Descartar notificación anterior si existe
+    if (toastIds.current.status) {
+      toast.dismiss(toastIds.current.status)
+    }
+
+    toastIds.current.status = toast.success(
       <div>
         <strong>Estado actualizado</strong>
         <p>
@@ -167,7 +188,11 @@ const TiposServicios = () => {
       setTiposServicios(updatedTiposServicios)
 
       // Añadir notificación
-      toast.info(
+      if (toastIds.current.delete) {
+        toast.dismiss(toastIds.current.delete)
+      }
+
+      toastIds.current.delete = toast.info(
         <div>
           <strong>Tipo de servicio eliminado</strong>
           <p>El tipo de servicio "{tipoServicioToDelete.nombre}" ha sido eliminado correctamente.</p>
@@ -208,6 +233,12 @@ const TiposServicios = () => {
       descripcion: "",
     })
 
+    // Resetear errores
+    setFormErrors({
+      nombre: "",
+      descripcion: "",
+    })
+
     setShowModal(true)
   }
 
@@ -216,7 +247,6 @@ const TiposServicios = () => {
    */
   const handleCloseModal = () => {
     setShowModal(false)
-    setErrors({}) // Limpiar errores al cerrar el modal
   }
 
   /**
@@ -230,13 +260,54 @@ const TiposServicios = () => {
       [name]: value,
     })
 
-    // Limpiar el error específico cuando el usuario escribe
-    if (errors[name]) {
-      setErrors({
-        ...errors,
+    // Limpiar el error específico cuando el usuario comienza a escribir
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
         [name]: "",
       })
     }
+  }
+
+  /**
+   * Validar el formulario completo
+   * @returns {boolean} - True si el formulario es válido, false en caso contrario
+   */
+  const validateForm = () => {
+    let isValid = true
+    const errors = {
+      nombre: "",
+      descripcion: "",
+    }
+
+    // Validar nombre (requerido y único)
+    if (!formData.nombre.trim()) {
+      errors.nombre = "El nombre del tipo de servicio es obligatorio"
+      isValid = false
+    } else if (formData.nombre.trim().length > 100) {
+      errors.nombre = "El nombre no puede exceder los 100 caracteres"
+      isValid = false
+    } else {
+      // Verificar si el nombre ya existe (excepto para el tipo de servicio actual en edición)
+      const nombreExiste = tiposServicios.some(
+        (t) =>
+          t.nombre.toLowerCase() === formData.nombre.trim().toLowerCase() &&
+          (!currentTipoServicio || t.id !== currentTipoServicio.id),
+      )
+      if (nombreExiste) {
+        errors.nombre = "Ya existe un tipo de servicio con este nombre"
+        isValid = false
+      }
+    }
+
+    // Validar descripción (opcional pero con longitud máxima)
+    if (formData.descripcion && formData.descripcion.length > 500) {
+      errors.descripcion = "La descripción no puede exceder los 500 caracteres"
+      isValid = false
+    }
+
+    setFormErrors(errors)
+    return isValid
   }
 
   /**
@@ -244,35 +315,16 @@ const TiposServicios = () => {
    * Valida los datos y envía la información
    */
   const handleSaveTipoServicio = () => {
-    // Validaciones básicas según la BD
-    const newErrors = {
-      nombre: "",
-    }
-    let isValid = true
+    // Validar el formulario
+    if (!validateForm()) {
+      // Mostrar notificación de error general
+      if (toastIds.current.error) {
+        toast.dismiss(toastIds.current.error)
+      }
 
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = "Por favor, ingrese un nombre para el tipo de servicio."
-      isValid = false
-    }
-
-    // Verificar si ya existe un tipo de servicio con el mismo nombre (excepto el actual)
-    const nombreExiste = tiposServicios.some(
-      (t) => t.nombre.toLowerCase() === formData.nombre.toLowerCase() && t.id !== (currentTipoServicio?.id || 0),
-    )
-
-    if (nombreExiste) {
-      newErrors.nombre = "Este nombre de tipo de servicio ya existe."
-      isValid = false
-    }
-
-    // Actualizar errores
-    setErrors(newErrors)
-
-    // Si hay errores, mostrar notificación y salir
-    if (!isValid) {
-      toast.error(
+      toastIds.current.error = toast.error(
         <div>
-          <strong>Error de validación</strong>
+          <strong>Error</strong>
           <p>Por favor, corrija los errores en el formulario.</p>
         </div>,
         {
@@ -293,8 +345,8 @@ const TiposServicios = () => {
         if (t.id === currentTipoServicio.id) {
           return {
             ...t,
-            nombre: formData.nombre,
-            descripcion: formData.descripcion,
+            nombre: formData.nombre.trim(),
+            descripcion: formData.descripcion.trim(),
           }
         }
         return t
@@ -303,10 +355,14 @@ const TiposServicios = () => {
       setTiposServicios(updatedTiposServicios)
 
       // Notificación de éxito para edición
-      toast.success(
+      if (toastIds.current.edit) {
+        toast.dismiss(toastIds.current.edit)
+      }
+
+      toastIds.current.edit = toast.success(
         <div>
           <strong>Tipo de servicio actualizado</strong>
-          <p>El tipo de servicio "{formData.nombre}" ha sido actualizado correctamente.</p>
+          <p>El tipo de servicio "{formData.nombre.trim()}" ha sido actualizado correctamente.</p>
         </div>,
         {
           icon: "✏️",
@@ -322,18 +378,22 @@ const TiposServicios = () => {
       // Crear nuevo tipo de servicio
       const newTipoServicio = {
         id: Date.now(), // ID temporal, en una implementación real vendría del backend
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim(),
         estado: "Activo",
       }
 
       setTiposServicios([...tiposServicios, newTipoServicio])
 
       // Notificación de éxito para creación
-      toast.success(
+      if (toastIds.current.create) {
+        toast.dismiss(toastIds.current.create)
+      }
+
+      toastIds.current.create = toast.success(
         <div>
           <strong>Tipo de servicio creado</strong>
-          <p>El tipo de servicio "{formData.nombre}" ha sido creado correctamente.</p>
+          <p>El tipo de servicio "{formData.nombre.trim()}" ha sido creado correctamente.</p>
         </div>,
         {
           icon: "✅",
@@ -349,7 +409,6 @@ const TiposServicios = () => {
 
     // Cerrar el modal
     setShowModal(false)
-    setErrors({}) // Limpiar errores al guardar
   }
 
   /**
@@ -359,34 +418,32 @@ const TiposServicios = () => {
     let modalInstance = null
     const modalElement = document.getElementById("tipoServicioModal")
 
-    if (showModal && modalElement) {
+    if (showModal) {
       import("bootstrap").then((bootstrap) => {
         modalInstance = new bootstrap.Modal(modalElement)
         modalInstance.show()
       })
+    } else {
+      // Si showModal es false y el modal está abierto, cerrarlo programáticamente
+      if (modalElement && modalElement.classList.contains("show")) {
+        import("bootstrap").then((bootstrap) => {
+          modalInstance = bootstrap.Modal.getInstance(modalElement)
+          if (modalInstance) {
+            modalInstance.hide()
+          }
+        })
+      }
     }
 
     // Evento para cuando el modal se cierra con el botón X o haciendo clic fuera
     const handleHidden = () => {
       setShowModal(false)
-      setErrors({}) // Limpiar errores al cerrar el modal
-      // Asegurarse de que se elimine cualquier backdrop residual
-      const backdrop = document.querySelector(".modal-backdrop")
-      if (backdrop) {
-        backdrop.remove()
-      }
-      document.body.classList.remove("modal-open")
-      document.body.style.overflow = ""
-      document.body.style.paddingRight = ""
     }
 
     modalElement?.addEventListener("hidden.bs.modal", handleHidden)
 
     return () => {
       modalElement?.removeEventListener("hidden.bs.modal", handleHidden)
-      if (modalInstance) {
-        modalInstance.hide()
-      }
       // Asegurarse de que se elimine cualquier backdrop residual al desmontar
       const backdrop = document.querySelector(".modal-backdrop")
       if (backdrop) {
@@ -411,110 +468,23 @@ const TiposServicios = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Tipo de Servicio */}
-      <div
-        className="modal fade"
-        id="tipoServicioModal"
-        tabIndex="-1"
-        aria-labelledby="tipoServicioModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="tipoServicioModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              {/* Modificar el formulario en el modal para mostrar errores de validación */}
-              <form className="tipo-servicio-form">
-                <div className="mb-3">
-                  <label htmlFor="nombre" className="form-label">
-                    Nombre del Tipo de Servicio <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
-                    id="nombre"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleInputChange}
-                    disabled={modalTitle === "Ver Detalles del Tipo de Servicio"}
-                    required
-                  />
-                  {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="descripcion" className="form-label">
-                    Descripción
-                  </label>
-                  <textarea
-                    className={`form-control ${errors.descripcion ? "is-invalid" : ""}`}
-                    id="descripcion"
-                    name="descripcion"
-                    rows="3"
-                    value={formData.descripcion}
-                    onChange={handleInputChange}
-                    disabled={modalTitle === "Ver Detalles del Tipo de Servicio"}
-                  ></textarea>
-                  {errors.descripcion && <div className="invalid-feedback">{errors.descripcion}</div>}
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles del Tipo de Servicio" && (
-                <button
-                  type="button"
-                  className="btn btn-primary d-flex align-items-center"
-                  onClick={handleSaveTipoServicio}
-                >
-                  <Save size={18} className="me-1" />
-                  Guardar Tipo de Servicio
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <TipoServicioForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        formErrors={formErrors}
+        onInputChange={handleInputChange}
+        onSave={handleSaveTipoServicio}
+        onClose={handleCloseModal}
+      />
 
       {/* Modal de confirmación para eliminar */}
-      {showDeleteConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showDeleteConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-danger text-white">
-              <h5 className="modal-title">Confirmar eliminación</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={cancelDelete}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-danger me-3" />
-                <p className="mb-0">¿Está seguro de eliminar el tipo de servicio "{tipoServicioToDelete?.nombre}"?</p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        tipoServicio={tipoServicioToDelete}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
       <ToastContainer
         position="top-right"

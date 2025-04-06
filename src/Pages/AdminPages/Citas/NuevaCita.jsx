@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ArrowLeft, AlertCircle } from "lucide-react"
 import { ToastContainer, toast } from "react-toastify"
@@ -12,6 +12,9 @@ import { CalendarComponent } from "../../../Components/AdminComponents/CitasComp
 import { TimeSlotsComponent } from "../../../Components/AdminComponents/CitasComponents/time-slots-component"
 import { FormComponent } from "../../../Components/AdminComponents/CitasComponents/form-component"
 
+/**
+ * Componente para agendar una nueva cita o editar una existente
+ */
 const NuevaCita = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -178,6 +181,9 @@ const NuevaCita = () => {
     },
   ]
 
+  // Referencias para las notificaciones
+  const toastIds = useRef({})
+
   // Estado para clientes y servicios
   const [clientes, setClientes] = useState(clientesMock)
   const [servicios, setServicios] = useState(serviciosMock)
@@ -312,48 +318,57 @@ const NuevaCita = () => {
     }))
   }, [selectedDate])
 
-  // Manejador para seleccionar un horario
-  const handleSelectTimeSlot = (timeSlot) => {
-    setSelectedTimeSlot(timeSlot)
-    setFormData({
-      ...formData,
-      hora: timeSlot,
-    })
-  }
-
-  // Manejador para seleccionar una fecha
-  const handleDateSelect = (date) => {
-    setSelectedDate(date)
-  }
-
-  // Manejador para ir al día siguiente
-  const handleNextDay = () => {
-    const nextDay = new Date(selectedDate)
-    nextDay.setDate(nextDay.getDate() + 1)
-
-    // Si el siguiente día es domingo, avanzar un día más
-    if (nextDay.getDay() === 0) {
-      nextDay.setDate(nextDay.getDate() + 1)
+  /**
+   * Validar el formulario de cita
+   * @returns {boolean} - True si el formulario es válido, false en caso contrario
+   */
+  const validateForm = () => {
+    const errors = {
+      cliente: "",
+      mascota: "",
+      mascotas: "",
+      servicios: "",
     }
 
-    setSelectedDate(nextDay)
+    let isValid = true
+
+    if (!formData.cliente) {
+      errors.cliente = "Debe seleccionar un cliente"
+      isValid = false
+    }
+
+    if (!formData.servicios || formData.servicios.length === 0) {
+      errors.servicios = "Debe seleccionar al menos un servicio"
+      isValid = false
+    }
+
+    // Validar que se haya seleccionado al menos una mascota
+    const tieneMultiplesMascotas = formData.servicios.some((servicio) => servicio.multiplesMascotas)
+
+    if (tieneMultiplesMascotas) {
+      if (formData.mascotas.length === 0) {
+        errors.mascotas = "Debe seleccionar al menos una mascota para los servicios elegidos"
+        isValid = false
+      }
+    } else {
+      if (!formData.mascota) {
+        errors.mascota = "Debe seleccionar una mascota para la cita"
+        isValid = false
+      }
+    }
+
+    setFormErrors(errors)
+    return isValid
   }
 
-  // Manejador para actualizar el formulario
-  const handleFormChange = (newFormData) => {
-    setFormData(newFormData)
-
-    // Limpiar errores cuando se actualizan los campos
-    const newErrors = { ...formErrors }
-    if (newFormData.cliente) newErrors.cliente = ""
-    if (newFormData.mascota) newErrors.mascota = ""
-    if (newFormData.mascotas && newFormData.mascotas.length > 0) newErrors.mascotas = ""
-    if (newFormData.servicios && newFormData.servicios.length > 0) newErrors.servicios = ""
-
-    setFormErrors(newErrors)
-  }
-
-  // Verificar si hay conflictos de horario con la duración del servicio
+  /**
+   * Verificar si hay conflictos de horario con la duración del servicio
+   * @param {string} fecha - Fecha de la cita
+   * @param {string} hora - Hora de la cita
+   * @param {Array} servicios - Servicios seleccionados
+   * @param {string} citaId - ID de la cita actual (para edición)
+   * @returns {boolean} - True si hay conflicto, false en caso contrario
+   */
   const checkTimeConflicts = (fecha, hora, servicios, citaId = null) => {
     // Convertir hora a minutos desde el inicio del día
     const [horaNum, minutosNum] = hora.split(":").map(Number)
@@ -390,47 +405,67 @@ const NuevaCita = () => {
     })
   }
 
-  // Manejador para guardar la cita
-  const handleSaveCita = () => {
-    // Validaciones básicas
-    const newErrors = {
-      cliente: "",
-      mascota: "",
-      mascotas: "",
-      servicios: "",
+  /**
+   * Manejador para seleccionar un horario
+   */
+  const handleSelectTimeSlot = (timeSlot) => {
+    setSelectedTimeSlot(timeSlot)
+    setFormData({
+      ...formData,
+      hora: timeSlot,
+    })
+  }
+
+  /**
+   * Manejador para seleccionar una fecha
+   */
+  const handleDateSelect = (date) => {
+    setSelectedDate(date)
+  }
+
+  /**
+   * Manejador para ir al día siguiente
+   */
+  const handleNextDay = () => {
+    const nextDay = new Date(selectedDate)
+    nextDay.setDate(nextDay.getDate() + 1)
+
+    // Si el siguiente día es domingo, avanzar un día más
+    if (nextDay.getDay() === 0) {
+      nextDay.setDate(nextDay.getDate() + 1)
     }
 
-    let isValid = true
+    setSelectedDate(nextDay)
+  }
 
-    if (!formData.cliente) {
-      newErrors.cliente = "Debe seleccionar un cliente"
-      isValid = false
-    }
+  /**
+   * Manejador para actualizar el formulario
+   */
+  const handleFormChange = (newFormData) => {
+    setFormData(newFormData)
 
-    if (!formData.servicios || formData.servicios.length === 0) {
-      newErrors.servicios = "Debe seleccionar al menos un servicio"
-      isValid = false
-    }
-
-    // Validar que se haya seleccionado al menos una mascota
-    const tieneMultiplesMascotas = formData.servicios.some((servicio) => servicio.multiplesMascotas)
-
-    if (tieneMultiplesMascotas) {
-      if (formData.mascotas.length === 0) {
-        newErrors.mascotas = "Debe seleccionar al menos una mascota para los servicios elegidos"
-        isValid = false
-      }
-    } else {
-      if (!formData.mascota) {
-        newErrors.mascota = "Debe seleccionar una mascota para la cita"
-        isValid = false
-      }
-    }
+    // Limpiar errores cuando se actualizan los campos
+    const newErrors = { ...formErrors }
+    if (newFormData.cliente) newErrors.cliente = ""
+    if (newFormData.mascota) newErrors.mascota = ""
+    if (newFormData.mascotas && newFormData.mascotas.length > 0) newErrors.mascotas = ""
+    if (newFormData.servicios && newFormData.servicios.length > 0) newErrors.servicios = ""
 
     setFormErrors(newErrors)
+  }
 
-    if (!isValid) {
-      toast.error(
+  /**
+   * Manejador para guardar la cita
+   */
+  const handleSaveCita = () => {
+    // Validar el formulario
+    if (!validateForm()) {
+      // Mostrar notificación de error general
+      if (toastIds.current.error) {
+        toast.dismiss(toastIds.current.error)
+      }
+
+      toastIds.current.error = toast.error(
         <div>
           <strong>Error</strong>
           <p>Por favor, complete todos los campos obligatorios.</p>
@@ -460,7 +495,11 @@ const NuevaCita = () => {
     )
 
     if (hayConflicto) {
-      toast.error(
+      if (toastIds.current.error) {
+        toast.dismiss(toastIds.current.error)
+      }
+
+      toastIds.current.error = toast.error(
         <div>
           <strong>Error</strong>
           <p>Este horario se solapa con otra cita existente. Por favor, seleccione otro horario.</p>
@@ -505,7 +544,11 @@ const NuevaCita = () => {
       const citasActualizadas = citasAgendadas.map((cita) => (cita.id === citaId ? { ...citaData, id: citaId } : cita))
       setCitasAgendadas(citasActualizadas)
 
-      toast.success(
+      if (toastIds.current.success) {
+        toast.dismiss(toastIds.current.success)
+      }
+
+      toastIds.current.success = toast.success(
         <div>
           <strong>Cita actualizada</strong>
           <p>La cita ha sido actualizada correctamente.</p>
@@ -533,7 +576,11 @@ const NuevaCita = () => {
 
       setCitasAgendadas([...citasAgendadas, nuevaCita])
 
-      toast.success(
+      if (toastIds.current.success) {
+        toast.dismiss(toastIds.current.success)
+      }
+
+      toastIds.current.success = toast.success(
         <div>
           <strong>Cita agendada</strong>
           <p>La cita ha sido agendada correctamente.</p>
@@ -564,12 +611,16 @@ const NuevaCita = () => {
     }
   }
 
-  // Manejador para cancelar y volver a la lista de citas
+  /**
+   * Manejador para cancelar y volver a la lista de citas
+   */
   const handleCancel = () => {
     navigate("/servicios/AgendarCitas")
   }
 
-  // Manejador para cuando se hace clic en una cita existente
+  /**
+   * Manejador para cuando se hace clic en una cita existente
+   */
   const handleCitaClick = (cita) => {
     // Si estamos en modo edición, preguntar si quiere cambiar
     if (isEditing) {

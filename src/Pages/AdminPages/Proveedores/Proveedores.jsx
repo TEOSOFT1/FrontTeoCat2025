@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import DataTable from "../../../Components/AdminComponents/DataTable"
 import TableActions from "../../../Components/AdminComponents/TableActions"
-import { Save, AlertTriangle } from "lucide-react"
 import "../../../Styles/AdminStyles/Proveedores.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../../../Styles/AdminStyles/ToastStyles.css"
+import ProveedorForm from "../../../Components/AdminComponents/ProveedoresComponents/ProveedorForm"
+import DeleteConfirmModal from "../../../Components/AdminComponents/ProveedoresComponents/DeleteConfirmModal"
 
 /**
  * Componente para la gestión de proveedores
@@ -77,12 +78,6 @@ const Proveedores = () => {
       ),
     },
   ]
-
-  /**
-   * Efecto para cargar datos iniciales
-   * En una implementación real, aquí se cargarían los datos desde la API
-   */
- 
 
   /**
    * Manejador para ver detalles de un proveedor
@@ -518,40 +513,6 @@ const Proveedores = () => {
     setShowModal(false)
   }
 
-  /**
-   * Efecto para inicializar el modal de Bootstrap
-   */
-  useEffect(() => {
-    let modalInstance = null
-    const modalElement = document.getElementById("proveedorModal")
-
-    if (showModal) {
-      import("bootstrap").then((bootstrap) => {
-        modalInstance = new bootstrap.Modal(modalElement)
-        modalInstance.show()
-      })
-    } else {
-      if (modalElement && modalElement.classList.contains("show")) {
-        import("bootstrap").then((bootstrap) => {
-          modalInstance = bootstrap.Modal.getInstance(modalElement)
-          if (modalInstance) {
-            modalInstance.hide()
-          }
-        })
-      }
-    }
-
-    const handleHidden = () => {
-      setShowModal(false)
-    }
-
-    modalElement?.addEventListener("hidden.bs.modal", handleHidden)
-
-    return () => {
-      modalElement?.removeEventListener("hidden.bs.modal", handleHidden)
-    }
-  }, [showModal])
-
   return (
     <div className="proveedores-container">
       <h2 className="mb-4">Gestión de Proveedores</h2>
@@ -565,193 +526,23 @@ const Proveedores = () => {
       />
 
       {/* Modal para Agregar/Editar/Ver Proveedor */}
-      <div
-        className="modal fade"
-        id="proveedorModal"
-        tabIndex="-1"
-        aria-labelledby="proveedorModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title" id="proveedorModalLabel">
-                {modalTitle}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={handleCloseModal}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="proveedor-form">
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="documento" className="form-label">
-                      Documento <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.documento ? "is-invalid" : ""}`}
-                      id="documento"
-                      name="documento"
-                      value={formData.documento}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      required
-                      placeholder="Ej: 900123456-7"
-                    />
-                    {formErrors.documento && <div className="invalid-feedback">{formErrors.documento}</div>}
-                    <small className="form-text text-muted">NIT, RUT o identificación fiscal del proveedor.</small>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="correo" className="form-label">
-                      Correo Electrónico
-                    </label>
-                    <input
-                      type="email"
-                      className={`form-control ${formErrors.correo ? "is-invalid" : ""}`}
-                      id="correo"
-                      name="correo"
-                      value={formData.correo}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      placeholder="correo@ejemplo.com"
-                    />
-                    {formErrors.correo && <div className="invalid-feedback">{formErrors.correo}</div>}
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="representante" className="form-label">
-                      Nombre (Representante) <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.representante ? "is-invalid" : ""}`}
-                      id="representante"
-                      name="representante"
-                      value={formData.representante}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      required
-                      placeholder="Nombre de la empresa o representante"
-                    />
-                    {formErrors.representante && <div className="invalid-feedback">{formErrors.representante}</div>}
-                    <small className="form-text text-muted">Nombre de la empresa o representante legal.</small>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="contacto" className="form-label">
-                      Persona de Contacto <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.contacto ? "is-invalid" : ""}`}
-                      id="contacto"
-                      name="contacto"
-                      value={formData.contacto}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      required
-                      placeholder="Nombre de la persona de contacto"
-                    />
-                    {formErrors.contacto && <div className="invalid-feedback">{formErrors.contacto}</div>}
-                    <small className="form-text text-muted">Persona con quien se mantiene el contacto directo.</small>
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="telefono" className="form-label">
-                      Teléfono <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      className={`form-control ${formErrors.telefono ? "is-invalid" : ""}`}
-                      id="telefono"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      required
-                      placeholder="Ej: 3101234567"
-                    />
-                    {formErrors.telefono && <div className="invalid-feedback">{formErrors.telefono}</div>}
-                    <small className="form-text text-muted">Número de teléfono de contacto (7-10 dígitos).</small>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="direccion" className="form-label">
-                      Dirección
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.direccion ? "is-invalid" : ""}`}
-                      id="direccion"
-                      name="direccion"
-                      value={formData.direccion}
-                      onChange={handleInputChange}
-                      disabled={modalTitle === "Ver Detalles del Proveedor"}
-                      placeholder="Dirección física del proveedor"
-                    />
-                    {formErrors.direccion && <div className="invalid-feedback">{formErrors.direccion}</div>}
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>
-                Cancelar
-              </button>
-
-              {modalTitle !== "Ver Detalles del Proveedor" && (
-                <button
-                  type="button"
-                  className="btn btn-primary d-flex align-items-center"
-                  onClick={handleSaveProveedor}
-                >
-                  <Save size={18} className="me-1" />
-                  Guardar Proveedor
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ProveedorForm
+        showModal={showModal}
+        modalTitle={modalTitle}
+        formData={formData}
+        formErrors={formErrors}
+        onInputChange={handleInputChange}
+        onSave={handleSaveProveedor}
+        onClose={handleCloseModal}
+      />
 
       {/* Modal de confirmación para eliminar */}
-      {showDeleteConfirm && <div className="modal-backdrop show"></div>}
-      <div className={`modal fade ${showDeleteConfirm ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header bg-danger text-white">
-              <h5 className="modal-title">Confirmar eliminación</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={cancelDelete}></button>
-            </div>
-            <div className="modal-body">
-              <div className="d-flex align-items-center">
-                <AlertTriangle size={24} className="text-danger me-3" />
-                <p className="mb-0">¿Está seguro de eliminar el proveedor "{proveedorToDelete?.representante}"?</p>
-              </div>
-              <p className="mt-2 text-muted small">
-                Esta acción no se puede deshacer. Si el proveedor tiene historial de compras, considere desactivarlo en
-                lugar de eliminarlo.
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        proveedor={proveedorToDelete}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
       <ToastContainer
         position="top-right"
