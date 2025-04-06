@@ -1,14 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import Navbar from "../Components/ClienteComponents/Navbar"
-import Footer from "../Components/ClienteComponents/Footer"
-import HomePage from "../Pages/ClientePages/HomePage"
+import Footer from "../Components/ClienteComponents/FooterC"
+import HomePage from "../Pages/ClientePages/home-page"
 import CatalogoPage from "../Pages/ClientePages/CatalogoPage"
 import ProductoDetallePage from "../Pages/ClientePages/ProductoDetallePage"
+import ServicioDetallePage from "../Pages/ClientePages/ServicioDetallePage"
 import ServiciosPage from "../Pages/ClientePages/ServiciosPage"
-import AgendarCitaPage from "../Pages/ClientePages/AgendarCitaPage"
-import SobreNosotrosPage from "../Pages/ClientePages/SobreNosotrosPage"
-import CarritoPage from "../Pages/ClientePages/CarritoPage"
-import PerfilPage from "../Pages/ClientePages/PerfilPage"
+import AgendarCitaPage from "../Pages/ClientePages/agendar-cita-page"
+import SobreNosotrosPage from "../Pages/ClientePages/sobre-nosotros-page"
+import CarritoPage from "../Pages/ClientePages/carrito-page"
+import PerfilPage from "../Pages/ClientePages/perfil-page"
+import TerminosCondicionesPage from "../Pages/ClientePages/terminos-condiciones-page"
+import PoliticaPrivacidadPage from "../Pages/ClientePages/politica-privacidad-page"
 import AuthPage from "../Pages/AuthPage"
 import RecoverPassword from "../Pages/RecoverPassword"
 import NuevaContra from "../Pages/NuevaContra"
@@ -84,6 +87,15 @@ const ClienteRoutes = () => {
       />
 
       <Route
+        path="/servicio/:id"
+        element={
+          <ClienteLayout>
+            <ServicioDetallePage />
+          </ClienteLayout>
+        }
+      />
+
+      <Route
         path="/agendar-cita"
         element={
           <ClienteLayout>
@@ -106,6 +118,25 @@ const ClienteRoutes = () => {
         element={
           <ClienteLayout>
             <CarritoPage />
+          </ClienteLayout>
+        }
+      />
+
+      {/* Nuevas rutas para términos y privacidad */}
+      <Route
+        path="/terminos"
+        element={
+          <ClienteLayout>
+            <TerminosCondicionesPage />
+          </ClienteLayout>
+        }
+      />
+
+      <Route
+        path="/privacidad"
+        element={
+          <ClienteLayout>
+            <PoliticaPrivacidadPage />
           </ClienteLayout>
         }
       />

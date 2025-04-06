@@ -1,28 +1,31 @@
-// Actualizar AppRoutes.jsx para incluir la ruta de TiposServicios
 import { Routes, Route, Navigate } from "react-router-dom"
 import Layout from "../Components/AdminComponents/Layout"
-import Dashboard from "../Pages/AdminPages/Dashboard"
-import UserProfile2 from "../Pages/AdminPages/UserProfile2"
-import Roles from "../Pages/AdminPages/Roles"
-import Usuarios from "../Pages/AdminPages/Usuarios"
-import Categorias from "../Pages/AdminPages/Categorias"
-import Productos from "../Pages/AdminPages/Productos"
-import Notificaciones from "../Pages/AdminPages/Notificaciones"
-import Proveedores from "../Pages/AdminPages/Proveedores"
-import Compras from "../Pages/AdminPages/Compras"
-import RegistrarCompra from "../Pages/AdminPages/RegistrarCompra"
-import Clientes from "../Pages/AdminPages/Clientes"
-import Ventas from "../Pages/AdminPages/Ventas"
-import RegistrarVenta from "../Pages/AdminPages/RegistrarVenta"
-import DevolucionVenta from "../Pages/AdminPages/DevolucionVenta"
-import TiposServicios from "../Pages/AdminPages/TiposServicios" 
-import Servicios from "../Pages/AdminPages/Servicios"
-import AgendarCitas from "../Pages/AdminPages/AgendarCitas"
-import NuevaCita from "../Pages/AdminPages/NuevaCita"
-import Mascotas from "../Pages/AdminPages/Mascotas"
+import Dashboard from "../Pages/AdminPages/Dashboard/Dashboard"
+import UserProfile2 from "../Pages/AdminPages/PerfilDelUsuario/UserProfile2.jsx"
+import Roles from "../Pages/AdminPages/Roles/Roles"
+import Usuarios from "../Pages/AdminPages/Usuarios/Usuarios"
+import Categorias from "../Pages/AdminPages/Categorias/Categorias"
+import Productos from "../Pages/AdminPages/Productos/Productos"
+import RegistrarProducto from "../Pages/AdminPages/Productos/RegistrarProducto"
+import Notificaciones from "../Pages/AdminPages/Notificaciones/Notificaciones"
+import Proveedores from "../Pages/AdminPages/Proveedores/Proveedores"
+import Compras from "../Pages/AdminPages/Compras/Compras"
+import RegistrarCompra from "../Pages/AdminPages/Compras/RegistrarCompra"
+import Clientes from "../Pages/AdminPages//Clientes/Clientes"
+import Ventas from "../Pages/AdminPages/Ventas/Ventas"
+import RegistrarVenta from "../Pages/AdminPages/Ventas/RegistrarVenta"
+import DevolucionVenta from "../Pages/AdminPages/Ventas/DevolucionVenta"
+import TiposServicios from "../Pages/AdminPages/TiposDeServicio/TiposServicios"
+import Servicios from "../Pages/AdminPages/Servicios/Servicios"
+import RegistrarServicio from "../Pages/AdminPages/Servicios/RegistrarServicio"
+import AgendarCitas from "../Pages/AdminPages/Citas/AgendarCitas"
+import NuevaCita from "../Pages/AdminPages/Citas/NuevaCita"
+import Mascotas from "../Pages/AdminPages/Mascotas/Mascotas"
 import AuthPage from "../Pages/AuthPage"
 import RecoverPassword from "../Pages/RecoverPassword"
+import NuevaContra from "../Pages/NuevaContra"
 import NotFound from "../Pages/NotFound"
+import FooterA from "../Components/AdminComponents/FooterA.jsx"
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }) => {
@@ -36,6 +39,11 @@ const ProtectedRoute = ({ children }) => {
   return children
 }
 
+// Componente de Layout personalizado que usa FooterA
+const LayoutWithFooterA = () => {
+  return <Layout footerComponent={<FooterA />} />
+}
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -43,13 +51,14 @@ const AppRoutes = () => {
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<AuthPage />} />
       <Route path="/recover-password" element={<RecoverPassword />} />
+      <Route path="/nueva-contrasena" element={<NuevaContra />} />
 
-      {/* Rutas protegidas dentro del Layout */}
+      {/* Rutas protegidas dentro del Layout con FooterA */}
       <Route
         path="/"
         element={
           <ProtectedRoute>
-            <Layout />
+            <LayoutWithFooterA />
           </ProtectedRoute>
         }
       >
@@ -65,6 +74,7 @@ const AppRoutes = () => {
         {/* Inventario */}
         <Route path="inventario/categorias" element={<Categorias />} />
         <Route path="inventario/productos" element={<Productos />} />
+        <Route path="inventario/registrar-producto" element={<RegistrarProducto />} />
         <Route path="inventario/notificaciones" element={<Notificaciones />} />
 
         {/* Compras */}
@@ -81,6 +91,7 @@ const AppRoutes = () => {
         {/* Servicios */}
         <Route path="servicios/tipos-servicios" element={<TiposServicios />} />
         <Route path="servicios/servicios" element={<Servicios />} />
+        <Route path="servicios/registrar-servicio" element={<RegistrarServicio />} />
         <Route path="servicios/AgendarCitas" element={<AgendarCitas />} />
         <Route path="servicios/NuevaCita" element={<NuevaCita />} />
 

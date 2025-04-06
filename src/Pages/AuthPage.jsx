@@ -48,15 +48,36 @@ const AuthPage = () => {
     setSuccess("")
     setLoading(true)
 
-    // Simulación de autenticación
+    // Simulación de autenticación con datos de ejemplo
     setTimeout(() => {
+      // Credenciales de administrador
       if (loginForm.email === "admin@teocat.com" && loginForm.password === "admin123") {
         setSuccess("Inicio de sesión exitoso. Redirigiendo...")
 
-        // Guardar token de autenticación
-        localStorage.setItem("token", "dummy-token")
+        // Guardar token y rol de autenticación
+        localStorage.setItem("token", "dummy-token-admin")
+        localStorage.setItem("userRole", "admin")
+
+        // Disparar evento de storage para actualizar el estado en RolRoutes
+        window.dispatchEvent(new Event("storage"))
 
         // Redirigir al dashboard después de un breve retraso para mostrar el mensaje de éxito
+        setTimeout(() => {
+          navigate("/")
+        }, 1500)
+      }
+      // Credenciales de cliente
+      else if (loginForm.email === "cliente@teocat.com" && loginForm.password === "cliente123") {
+        setSuccess("Inicio de sesión exitoso. Redirigiendo...")
+
+        // Guardar token y rol de autenticación
+        localStorage.setItem("token", "dummy-token-cliente")
+        localStorage.setItem("userRole", "cliente")
+
+        // Disparar evento de storage para actualizar el estado en RolRoutes
+        window.dispatchEvent(new Event("storage"))
+
+        // Redirigir a la página principal después de un breve retraso
         setTimeout(() => {
           navigate("/")
         }, 1500)
@@ -87,7 +108,7 @@ const AuthPage = () => {
         return
       }
 
-      // Simulación de registro exitoso
+      // Simulación de registro exitoso - por defecto registramos como cliente
       setSuccess("Registro exitoso. Ahora puedes iniciar sesión.")
       setLoading(false)
 

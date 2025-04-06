@@ -35,17 +35,6 @@ $teocat-blue: #00b2e3;
         height: 400px;
         object-fit: cover;
       }
-      
-      .discount-badge {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        background-color: $teocat-green;
-        color: white;
-        font-weight: 600;
-        padding: 0.35rem 0.75rem;
-        border-radius: 0.25rem;
-      }
     }
     
     .thumbnail-container {
@@ -92,13 +81,6 @@ $teocat-blue: #00b2e3;
     }
     
     .product-price {
-      .original-price {
-        text-decoration: line-through;
-        color: #6c757d;
-        font-size: 1.25rem;
-        margin-right: 0.75rem;
-      }
-      
       .current-price {
         font-weight: 700;
         color: $teocat-green;
@@ -288,13 +270,6 @@ $teocat-blue: #00b2e3;
       }
       
       .related-product-price {
-        .original-price {
-          text-decoration: line-through;
-          color: #6c757d;
-          font-size: 0.875rem;
-          display: block;
-        }
-        
         .current-price {
           font-weight: 700;
           color: $teocat-green;

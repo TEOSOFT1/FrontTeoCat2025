@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Container, Row, Col, Form, Button, InputGroup, Card, Pagination } from "react-bootstrap"
-import ProductCard from "../../Components/ClienteComponents/ProductCard"
-import "./CatalogoPage.scss"
+import ProductCard from "../../Components/ClienteComponents/CatalogoComponents/ProductCard"
+import "../../Pages/ClientePages/CatalogoPage.scss"
 
 const CatalogoPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -39,8 +39,6 @@ const CatalogoPage = () => {
         name: "Alimento Premium para Perros",
         category: "Alimentos",
         price: 75000,
-        originalPrice: 85000,
-        discount: 12,
         rating: 4.8,
         stock: 15,
         image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=500",
@@ -50,8 +48,6 @@ const CatalogoPage = () => {
         name: "Juguete Interactivo para Gatos",
         category: "Juguetes",
         price: 35000,
-        originalPrice: 35000,
-        discount: 0,
         rating: 4.5,
         stock: 20,
         image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?q=80&w=500",
@@ -61,8 +57,6 @@ const CatalogoPage = () => {
         name: "Cama Ortopédica para Mascotas",
         category: "Accesorios",
         price: 120000,
-        originalPrice: 150000,
-        discount: 20,
         rating: 4.9,
         stock: 8,
         image: "https://images.unsplash.com/photo-1567612529009-afe25813a308?q=80&w=500",
@@ -72,8 +66,6 @@ const CatalogoPage = () => {
         name: "Collar Ajustable con GPS",
         category: "Accesorios",
         price: 89000,
-        originalPrice: 89000,
-        discount: 0,
         rating: 4.7,
         stock: 12,
         image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=500",
@@ -83,8 +75,6 @@ const CatalogoPage = () => {
         name: "Alimento Húmedo para Gatos",
         category: "Alimentos",
         price: 45000,
-        originalPrice: 50000,
-        discount: 10,
         rating: 4.6,
         stock: 25,
         image: "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?q=80&w=500",
@@ -94,8 +84,6 @@ const CatalogoPage = () => {
         name: "Pelota de Juguete Resistente",
         category: "Juguetes",
         price: 25000,
-        originalPrice: 25000,
-        discount: 0,
         rating: 4.3,
         stock: 30,
         image: "https://images.unsplash.com/photo-1546491764-67a5b8d5b3ae?q=80&w=500",
@@ -105,8 +93,6 @@ const CatalogoPage = () => {
         name: "Transportadora para Mascotas",
         category: "Accesorios",
         price: 150000,
-        originalPrice: 180000,
-        discount: 17,
         rating: 4.8,
         stock: 5,
         image: "https://images.unsplash.com/photo-1535294435445-d7249524ef2e?q=80&w=500",
@@ -116,8 +102,6 @@ const CatalogoPage = () => {
         name: "Snacks Naturales para Perros",
         category: "Alimentos",
         price: 30000,
-        originalPrice: 30000,
-        discount: 0,
         rating: 4.5,
         stock: 40,
         image: "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?q=80&w=500",
@@ -127,8 +111,6 @@ const CatalogoPage = () => {
         name: "Rascador para Gatos",
         category: "Accesorios",
         price: 85000,
-        originalPrice: 100000,
-        discount: 15,
         rating: 4.7,
         stock: 10,
         image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?q=80&w=500",
@@ -138,8 +120,6 @@ const CatalogoPage = () => {
         name: "Champú Hipoalergénico",
         category: "Higiene",
         price: 28000,
-        originalPrice: 28000,
-        discount: 0,
         rating: 4.4,
         stock: 22,
         image: "https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?q=80&w=500",
@@ -149,8 +129,6 @@ const CatalogoPage = () => {
         name: "Correa Retráctil",
         category: "Accesorios",
         price: 45000,
-        originalPrice: 55000,
-        discount: 18,
         rating: 4.2,
         stock: 15,
         image: "https://images.unsplash.com/photo-1567612529009-afe25813a308?q=80&w=500",
@@ -160,8 +138,6 @@ const CatalogoPage = () => {
         name: "Comedero Automático",
         category: "Accesorios",
         price: 120000,
-        originalPrice: 120000,
-        discount: 0,
         rating: 4.6,
         stock: 8,
         image: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?q=80&w=500",
@@ -211,6 +187,15 @@ const CatalogoPage = () => {
     // Filtrar por valoración
     if (selectedRating > 0) {
       result = result.filter((product) => product.rating >= selectedRating)
+    }
+
+    // Aplicar ordenamiento
+    if (sortBy === "price-asc") {
+      result.sort((a, b) => a.price - b.price)
+    } else if (sortBy === "price-desc") {
+      result.sort((a, b) => b.price - a.price)
+    } else if (sortBy === "rating") {
+      result.sort((a, b) => b.rating - a.rating)
     }
 
     setFilteredProducts(result)
@@ -418,8 +403,6 @@ const CatalogoPage = () => {
                     </div>
                   </div>
 
-                  {/* Filtro por disponibilidad */}
-
                   {/* Ordenar por */}
                   <div>
                     <h6 className="filter-subtitle mb-3">Ordenar por</h6>
@@ -428,7 +411,6 @@ const CatalogoPage = () => {
                       <option value="price-asc">Precio: Menor a Mayor</option>
                       <option value="price-desc">Precio: Mayor a Menor</option>
                       <option value="rating">Mejor Valorados</option>
-                      <option value="discount">Mayor Descuento</option>
                     </Form.Select>
                   </div>
                 </Card.Body>
@@ -458,7 +440,6 @@ const CatalogoPage = () => {
                       <option value="price-asc">Precio: Menor a Mayor</option>
                       <option value="price-desc">Precio: Mayor a Menor</option>
                       <option value="rating">Mejor Valorados</option>
-                      <option value="discount">Mayor Descuento</option>
                     </Form.Select>
                   </div>
                 </div>
@@ -467,9 +448,7 @@ const CatalogoPage = () => {
                   <Row className="g-4">
                     {paginatedProducts.map((product) => (
                       <Col md={6} lg={4} key={product.id}>
-                        <div className="product-item-container">
-                          <ProductCard product={product} />
-                        </div>
+                        <ProductCard product={product} />
                       </Col>
                     ))}
                   </Row>

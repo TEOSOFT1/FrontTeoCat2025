@@ -1,0 +1,485 @@
+// Variables
+$primary-color: #00BFFF;
+$secondary-color: #FF00FF;
+$tertiary-color: #00FF00;
+$background-color: #ffffff;
+$card-bg: #ffffff;
+$text-color: #333333;
+$text-muted: #6b7280;
+$border-color: rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.06);
+$border-radius: 16px;
+$transition-speed: 0.3s;
+
+// Dashboard styles
+.dashboard {
+  padding: 1.5rem;
+  background-color: $background-color;
+  min-height: 100vh;
+  position: relative;
+  color: $text-color;
+  overflow: hidden;
+  
+  // Fondo animado con CSS
+  .animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    
+    // Rayos de luz
+    .light-beam {
+      position: absolute;
+      background: linear-gradient(90deg, rgba(0, 191, 255, 0.05), rgba(255, 0, 255, 0.05));
+      height: 100%;
+      width: 30%;
+      border-radius: 50%;
+      filter: blur(30px);
+      opacity: 0.5;
+      transform-origin: center;
+      animation: rotate 20s infinite linear;
+      
+      &.light-beam-1 {
+        top: -20%;
+        left: 10%;
+        animation-duration: 25s;
+      }
+      
+      &.light-beam-2 {
+        top: 30%;
+        right: -10%;
+        animation-duration: 30s;
+        animation-delay: -5s;
+        background: linear-gradient(90deg, rgba(0, 255, 0, 0.05), rgba(0, 191, 255, 0.05));
+      }
+      
+      &.light-beam-3 {
+        bottom: -10%;
+        left: 30%;
+        animation-duration: 35s;
+        animation-delay: -10s;
+        background: linear-gradient(90deg, rgba(255, 0, 255, 0.05), rgba(0, 255, 0, 0.05));
+      }
+    }
+    
+    // Huellas flotantes
+    .floating-paws {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      
+      .paw {
+        position: absolute;
+        font-size: 24px;
+        opacity: 0.2;
+        animation: float 15s infinite linear;
+        
+        &.paw-1 {
+          top: 15%;
+          left: 10%;
+          animation-duration: 20s;
+        }
+        
+        &.paw-2 {
+          top: 40%;
+          right: 15%;
+          animation-duration: 25s;
+          animation-delay: -5s;
+        }
+        
+        &.paw-3 {
+          bottom: 20%;
+          left: 30%;
+          animation-duration: 22s;
+          animation-delay: -10s;
+        }
+        
+        &.paw-4 {
+          top: 25%;
+          right: 35%;
+          animation-duration: 18s;
+          animation-delay: -8s;
+        }
+        
+        &.paw-5 {
+          bottom: 35%;
+          right: 25%;
+          animation-duration: 23s;
+          animation-delay: -12s;
+        }
+      }
+    }
+  }
+  
+  // Dashboard header
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: $text-color;
+      margin: 0;
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      
+      &.pulse-animation {
+        animation: pulse 3s infinite ease-in-out;
+      }
+    }
+    
+    .date-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: $text-muted;
+      font-size: 0.875rem;
+      background: rgba(0, 0, 0, 0.02);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      box-shadow: $shadow-sm;
+      
+      svg {
+        color: $primary-color;
+      }
+    }
+  }
+  
+  // Filters container
+  .filters-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+    
+    .year-month-filters {
+      display: flex;
+      gap: 0.75rem;
+      
+      .filter {
+        position: relative;
+        
+        .year-selector,
+        .month-selector {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: $card-bg;
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          font-size: 0.875rem;
+          color: $text-color;
+          transition: all $transition-speed ease;
+          box-shadow: $shadow-sm;
+          border: 1px solid $border-color;
+          
+          &:hover {
+            box-shadow: $shadow-md;
+          }
+          
+          svg {
+            color: $primary-color;
+          }
+        }
+        
+        .year-dropdown,
+        .month-dropdown {
+          position: absolute;
+          top: calc(100% + 0.5rem);
+          right: 0;
+          background: $card-bg;
+          border-radius: 12px;
+          box-shadow: $shadow-lg;
+          min-width: 150px;
+          z-index: 10;
+          overflow: hidden;
+          border: 1px solid $border-color;
+          
+          .dropdown-item {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            color: $text-color;
+            cursor: pointer;
+            transition: all $transition-speed ease;
+            
+            &:hover {
+              background: rgba(0, 0, 0, 0.02);
+            }
+            
+            &.active {
+              background: rgba($primary-color, 0.1);
+              color: $primary-color;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Charts layout
+  .charts-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+    
+    .secondary-charts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      
+      @media (min-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .main-chart {
+      width: 100%;
+    }
+  }
+  
+  // Chart container
+  .chart-container {
+    background: $card-bg;
+    border-radius: $border-radius;
+    padding: 1.5rem;
+    box-shadow: $shadow-lg;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $border-color;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.1);
+      
+      &::before {
+        opacity: 1;
+      }
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      
+      .chart-title {
+        .title-with-icon {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.25rem;
+          
+          .icon-container {
+            position: relative;
+            
+            .chart-icon {
+              color: #fff;
+              padding: 0.5rem;
+              border-radius: 10px;
+              box-sizing: content-box;
+            }
+            
+            .icon-badge {
+              position: absolute;
+              bottom: -5px;
+              right: -5px;
+              font-size: 14px;
+              background: #fff;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: $shadow-sm;
+            }
+          }
+          
+          h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $text-color;
+            margin: 0;
+          }
+        }
+        
+        .chart-subtitle {
+          font-size: 0.875rem;
+          color: $text-muted;
+          margin: 0.25rem 0 0 0;
+          padding-left: 2.75rem;
+        }
+      }
+      
+      .chart-value {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        
+        .value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: $text-color;
+          
+          &.up {
+            color: $tertiary-color;
+          }
+          
+          &.down {
+            color: $secondary-color;
+          }
+        }
+        
+        .label {
+          font-size: 0.75rem;
+          color: $text-muted;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+    
+    .chart-content {
+      flex: 1;
+      position: relative;
+    }
+    
+    // Estilos específicos para cada tipo de gráfico
+    &.main-chart {
+      .chart-icon {
+        background: $primary-color;
+        box-shadow: 0 0 10px rgba($primary-color, 0.3);
+      }
+    }
+    
+    &.top-products-chart {
+      .chart-icon {
+        background: $secondary-color;
+        box-shadow: 0 0 10px rgba($secondary-color, 0.3);
+      }
+    }
+    
+    &.least-products-chart {
+      .chart-icon {
+        background: $tertiary-color;
+        box-shadow: 0 0 10px rgba($tertiary-color, 0.3);
+      }
+    }
+  }
+  
+  // Animaciones CSS para las líneas y elementos
+  .line-animation {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 2s ease-in-out forwards;
+  }
+  
+  .line-animation-pink {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 2s ease-in-out 0.3s forwards;
+  }
+  
+  .line-animation-green {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 2s ease-in-out 0.6s forwards;
+  }
+  
+  .bar-animation {
+    animation: grow 1.5s ease-out forwards;
+  }
+}
+
+// Keyframes para animaciones
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(0) translateX(20px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(20px) translateX(10px) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+}
+

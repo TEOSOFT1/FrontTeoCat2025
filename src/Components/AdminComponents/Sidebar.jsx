@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import PropTypes from "prop-types"
 import { Home, Settings, Package, ShoppingCart, DollarSign, Scissors, PawPrint, ChevronRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import logo from "../../assets/Logo2.jpg"
-import "../../Styles/AdminStyles/Sidebar.css"
+import "./Sidebar.scss"
 
 const menuItems = [
   {
@@ -27,6 +28,7 @@ const menuItems = [
     submenu: [
       { title: "Categorías", path: "/inventario/categorias" },
       { title: "Productos", path: "/inventario/productos" },
+      { title: "Registrar Nuevo Producto", path: "/inventario/registrar-producto" },
       { title: "Notificaciones", path: "/inventario/notificaciones" },
     ],
   },
@@ -54,21 +56,32 @@ const menuItems = [
     submenu: [
       { title: "Tipos de Servicios", path: "/servicios/tipos-servicios" },
       { title: "Servicios", path: "/servicios/servicios" },
+      { title: "Registrar Nuevo Servicio", path: "/servicios/registrar-servicio" },
       { title: "Agendar Citas", path: "/servicios/AgendarCitas" },
     ],
   },
   {
     title: "Mascotas",
     icon: PawPrint,
-    submenu: [
-      { title: "Registrar Mascota", path: "/mascotas/lista" },
-    ],
+    submenu: [{ title: "Registrar Mascota", path: "/mascotas/lista" }],
   },
 ]
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation()
   const [openMenus, setOpenMenus] = useState(new Set())
+  const [logoHovered, setLogoHovered] = useState(false)
+
+  // Check active routes on mount and set corresponding menus open
+  useEffect(() => {
+    const activeMenus = new Set()
+    menuItems.forEach((item) => {
+      if (item.submenu && item.submenu.some((subItem) => location.pathname === subItem.path)) {
+        activeMenus.add(item.title)
+      }
+    })
+    setOpenMenus(activeMenus)
+  }, [location.pathname])
 
   const toggleMenu = (title) => {
     setOpenMenus((prev) => {
@@ -87,20 +100,72 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
-        {/* Sidebar Header con Logo */}
+      <motion.aside
+        className={`sidebar ${isOpen ? "open" : ""}`}
+        animate={{
+          width: isOpen ? "280px" : "0px",
+          opacity: isOpen ? 1 : 0,
+          x: isOpen ? 0 : -20,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
+        {/* Sidebar Header con Logo Mejorado */}
         <div className="sidebar-header">
-          <Link to="/" className="logo">
-            <img src={logo || "/placeholder.svg"} alt="Teo/Cat Logo" className="logo-img" />
+          <Link
+            to="/"
+            className="logo"
+            onMouseEnter={() => setLogoHovered(true)}
+            onMouseLeave={() => setLogoHovered(false)}
+          >
+            <motion.div
+              className="logo-container"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <motion.img
+                src={logo || "/placeholder.svg"}
+                alt="Teo/Cat Logo"
+                className="logo-img"
+                initial={{ scale: 0.9 }}
+                animate={{
+                  scale: logoHovered ? 1.05 : 1,
+                  rotate: logoHovered ? 5 : 0,
+                }}
+                transition={{
+                  duration: 0.4,
+                  ease: "easeInOut",
+                }}
+                whileTap={{ scale: 0.95 }}
+              />
+              <motion.div
+                className="logo-shine"
+                initial={{ opacity: 0, x: -100 }}
+                animate={{
+                  opacity: logoHovered ? [0, 0.7, 0] : 0,
+                  x: logoHovered ? [-100, 100, 300] : -100,
+                }}
+                transition={{
+                  duration: 1.2,
+                  ease: "easeInOut",
+                  times: [0, 0.5, 1],
+                  repeat: logoHovered ? Number.POSITIVE_INFINITY : 0,
+                  repeatDelay: 2,
+                }}
+              />
+            </motion.div>
           </Link>
         </div>
 
         {/* Sidebar Navigation */}
         <nav className="sidebar-nav">
           {menuItems.map((item, index) => (
-            <div
+            <motion.div
               key={index}
               className={`nav-item ${item.submenu && isMenuActive(item.submenu) ? "active-parent" : ""}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               {item.submenu ? (
                 <>
@@ -111,21 +176,39 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   >
                     <item.icon className="nav-icon" />
                     <span className="nav-text">{item.title}</span>
-                    <ChevronRight className={`nav-arrow ${openMenus.has(item.title) ? "rotate" : ""}`} />
+                    <motion.div animate={{ rotate: openMenus.has(item.title) ? 90 : 0 }} transition={{ duration: 0.2 }}>
+                      <ChevronRight className="nav-arrow" />
+                    </motion.div>
                   </button>
 
-                  <div className={`submenu ${openMenus.has(item.title) ? "open" : ""}`}>
-                    {item.submenu.map((subItem, subIndex) => (
-                      <Link
-                        key={subIndex}
-                        to={subItem.path}
-                        className={`submenu-link ${isActive(subItem.path) ? "active" : ""}`}
+                  <AnimatePresence>
+                    {openMenus.has(item.title) && (
+                      <motion.div
+                        className="submenu open"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
                       >
-                        <span className="submenu-dot" />
-                        <span className="submenu-text">{subItem.title}</span>
-                      </Link>
-                    ))}
-                  </div>
+                        {item.submenu.map((subItem, subIndex) => (
+                          <motion.div
+                            key={subIndex}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.2, delay: subIndex * 0.05 }}
+                          >
+                            <Link
+                              to={subItem.path}
+                              className={`submenu-link ${isActive(subItem.path) ? "active" : ""}`}
+                            >
+                              <span className="submenu-dot" />
+                              <span className="submenu-text">{subItem.title}</span>
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               ) : (
                 <Link to={item.path} className={`nav-link ${isActive(item.path) ? "active" : ""}`}>
@@ -133,13 +216,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   <span className="nav-text">{item.title}</span>
                 </Link>
               )}
-            </div>
+            </motion.div>
           ))}
         </nav>
-      </aside>
+      </motion.aside>
 
       {/* Backdrop para móviles */}
-      {isOpen && <div className="sidebar-backdrop" onClick={toggleSidebar} />}
+      {isOpen && (
+        <motion.div
+          className="sidebar-backdrop"
+          onClick={toggleSidebar}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        />
+      )}
     </>
   )
 }

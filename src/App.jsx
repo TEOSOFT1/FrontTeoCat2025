@@ -1,10 +1,8 @@
 "use client"
 
-import { BrowserRouter } from "react-router-dom"
-import { ToastContainer } from "react-toastify"
-import AppRoutes from "./Routes/AppRoutes"
-import ClienteRoutes from "./Routes/ClienteRoutes"
 import { useEffect } from "react"
+import { ToastContainer } from "react-toastify"
+import RolRoutes from "./Routes/RolRoutes"
 
 // Importar estilos
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -23,16 +21,12 @@ function App() {
     import("bootstrap/dist/js/bootstrap.bundle.min.js")
   }, [])
 
-  // Determinar qué rutas mostrar basado en la URL
-  const isAdminRoute = window.location.pathname.includes("/admin")
-
   return (
-    <BrowserRouter>
-      {isAdminRoute ? <AppRoutes /> : <ClienteRoutes />}
+    <>
+      <RolRoutes />
       <ToastContainer position="top-right" autoClose={3000} />
-    </BrowserRouter>
+    </>
   )
 }
 
 export default App
-

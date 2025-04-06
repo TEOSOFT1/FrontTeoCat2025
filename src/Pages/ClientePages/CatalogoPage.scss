@@ -169,6 +169,20 @@ $teocat-blue: #00b2e3;
 
   .product-item-container {
     height: 100%;
+    display: flex;
+    
+    // Ocultar el "0" que aparece en algunas tarjetas
+    > :first-child:not(.product-card) {
+      display: none;
+    }
+    
+    // Asegurar que la tarjeta ocupe todo el espacio disponible
+    .product-card {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .pagination-container {

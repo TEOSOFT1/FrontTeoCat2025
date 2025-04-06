@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { Container, Row, Col, Button, Tabs, Tab, Form, Badge } from "react-bootstrap"
+import { Container, Row, Col, Button, Tabs, Tab, Form } from "react-bootstrap"
 import { toast } from "react-toastify"
-import "./ProductoDetallePage.scss"
+import "../../Pages/ClientePages/ProductoDetallePage.scss"
 
 const ProductoDetallePage = () => {
   const { id } = useParams()
@@ -13,108 +13,302 @@ const ProductoDetallePage = () => {
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState("descripcion")
   const [relatedProducts, setRelatedProducts] = useState([])
+  const [selectedImage, setSelectedImage] = useState(0)
 
   useEffect(() => {
+    // Resetear el estado cuando cambia el ID del producto
+    setLoading(true)
+    setQuantity(1)
+    setSelectedImage(0)
+
     // Simulación de carga de datos desde API
     // En producción, aquí harías fetch a tu API con el ID del producto
+    fetchProductData(id)
+  }, [id])
 
+  const fetchProductData = (productId) => {
+    // Simulación de carga de datos desde API
+    // En producción, aquí harías fetch a tu API con el ID del producto
     setTimeout(() => {
-      const mockProduct = {
-        id: Number.parseInt(id),
-        name: "Alimento Premium para Perros",
-        category: "Alimentos",
-        price: 75000,
-        originalPrice: 85000,
-        discount: 12,
-        rating: 4.8,
-        stock: 15,
-        description:
-          "Alimento premium para perros adultos de todas las razas. Formulado con ingredientes naturales de alta calidad que proporcionan una nutrición completa y balanceada para tu mascota. Contiene proteínas de primera calidad, vitaminas y minerales esenciales para mantener la salud y vitalidad de tu perro.",
-        features: [
-          "Ingredientes 100% naturales",
-          "Sin conservantes artificiales",
-          "Alto contenido proteico",
-          "Mejora el sistema inmunológico",
-          "Promueve un pelaje brillante y saludable",
-        ],
-        specifications: {
-          Peso: "15 kg",
-          Tipo: "Alimento seco",
-          "Etapa de vida": "Adulto",
-          "Tamaño de raza": "Todas las razas",
-          Sabor: "Pollo y arroz",
-          "Ingredientes principales": "Pollo, arroz, maíz, aceite de pescado",
+      // Datos de productos simulados
+      const allProducts = [
+        {
+          id: 1,
+          name: "Alimento Premium para Perros",
+          category: "Alimentos",
+          price: 75000,
+          rating: 4.8,
+          stock: 15,
+          description:
+            "Alimento premium para perros adultos de todas las razas. Formulado con ingredientes naturales de alta calidad que proporcionan una nutrición completa y balanceada para tu mascota. Contiene proteínas de primera calidad, vitaminas y minerales esenciales para mantener la salud y vitalidad de tu perro.",
+          features: [
+            "Ingredientes 100% naturales",
+            "Sin conservantes artificiales",
+            "Alto contenido proteico",
+            "Mejora el sistema inmunológico",
+            "Promueve un pelaje brillante y saludable",
+          ],
+          specifications: {
+            Peso: "15 kg",
+            Tipo: "Alimento seco",
+            "Etapa de vida": "Adulto",
+            "Tamaño de raza": "Todas las razas",
+            Sabor: "Pollo y arroz",
+            "Ingredientes principales": "Pollo, arroz, maíz, aceite de pescado",
+          },
+          images: [
+            "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=1200",
+            "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?q=80&w=1200",
+            "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=1200",
+          ],
+          reviews: [
+            {
+              id: 1,
+              user: "Carlos Rodríguez",
+              rating: 5,
+              date: "15/02/2024",
+              comment: "Excelente producto. Mi perro lo adora y he notado mejoras en su pelaje y energía.",
+            },
+            {
+              id: 2,
+              user: "María López",
+              rating: 4,
+              date: "28/01/2024",
+              comment: "Buena calidad, aunque el precio es un poco elevado. Mi mascota lo come sin problemas.",
+            },
+            {
+              id: 3,
+              user: "Juan Pérez",
+              rating: 5,
+              date: "10/01/2024",
+              comment: "Llevo varios meses comprando este alimento y mi perro está más saludable que nunca.",
+            },
+          ],
         },
-        images: [
-          "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=1200",
-          "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?q=80&w=1200",
-          "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=1200",
-        ],
-        reviews: [
-          {
-            id: 1,
-            user: "Carlos Rodríguez",
-            rating: 5,
-            date: "15/02/2024",
-            comment: "Excelente producto. Mi perro lo adora y he notado mejoras en su pelaje y energía.",
+        {
+          id: 2,
+          name: "Juguete Interactivo para Gatos",
+          category: "Juguetes",
+          price: 35000,
+          rating: 4.5,
+          stock: 20,
+          description:
+            "Juguete interactivo diseñado específicamente para estimular el instinto de caza de los gatos. Este juguete ayuda a mantener a tu felino activo y entretenido, reduciendo el aburrimiento y los comportamientos destructivos. Fabricado con materiales seguros y duraderos que resistirán incluso a los gatos más juguetones.",
+          features: [
+            "Estimula el instinto natural de caza",
+            "Materiales seguros y no tóxicos",
+            "Diseño atractivo para gatos",
+            "Reduce el estrés y la ansiedad",
+            "Fácil de limpiar",
+          ],
+          specifications: {
+            Material: "Plástico ABS y poliéster",
+            Dimensions: "30 x 20 x 15 cm",
+            Peso: "300 g",
+            Edad: "Todas las edades",
+            Incluye: "Juguete base, 3 plumas reemplazables, motor",
+            Baterías: "2 x AA (no incluidas)",
           },
-          {
-            id: 2,
-            user: "María López",
-            rating: 4,
-            date: "28/01/2024",
-            comment: "Buena calidad, aunque el precio es un poco elevado. Mi mascota lo come sin problemas.",
+          images: [
+            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?q=80&w=1200",
+            "https://images.unsplash.com/photo-1545249390-6bdfa286032f?q=80&w=1200",
+            "https://images.unsplash.com/photo-1574158622682-e40e69881006?q=80&w=1200",
+          ],
+          reviews: [
+            {
+              id: 1,
+              user: "Ana Martínez",
+              rating: 5,
+              date: "20/02/2024",
+              comment: "Mi gato no se separa de este juguete. ¡Ha sido la mejor compra que he hecho para él!",
+            },
+            {
+              id: 2,
+              user: "Pedro Sánchez",
+              rating: 4,
+              date: "15/01/2024",
+              comment: "Muy buen juguete, aunque las plumas se desgastan rápido con el uso intensivo.",
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "Cama Ortopédica para Mascotas",
+          category: "Accesorios",
+          price: 120000,
+          rating: 4.9,
+          stock: 8,
+          description:
+            "Cama ortopédica de alta calidad diseñada para proporcionar el máximo confort y soporte a mascotas de todas las edades, especialmente beneficiosa para mascotas mayores o con problemas articulares. La espuma viscoelástica de primera calidad se adapta al cuerpo de tu mascota, aliviando la presión en las articulaciones y mejorando la calidad del sueño.",
+          features: [
+            "Espuma viscoelástica de 10 cm de grosor",
+            "Funda removible y lavable a máquina",
+            "Base antideslizante",
+            "Bordes elevados para mayor seguridad",
+            "Resistente al agua y a las manchas",
+          ],
+          specifications: {
+            Tamaño: "100 x 70 x 20 cm",
+            Material: "Espuma viscoelástica, poliéster",
+            "Capacidad de peso": "Hasta 40 kg",
+            "Funda exterior": "Microfibra suave",
+            "Funda interior": "Impermeable",
+            Mantenimiento: "Funda lavable a máquina",
           },
-          {
-            id: 3,
-            user: "Juan Pérez",
-            rating: 5,
-            date: "10/01/2024",
-            comment: "Llevo varios meses comprando este alimento y mi perro está más saludable que nunca.",
+          images: [
+            "https://images.unsplash.com/photo-1567612529009-afe25813a308?q=80&w=1200",
+            "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=1200",
+            "https://images.unsplash.com/photo-1598875184988-5e67b1a874b8?q=80&w=1200",
+          ],
+          reviews: [
+            {
+              id: 1,
+              user: "Laura Gómez",
+              rating: 5,
+              date: "05/03/2024",
+              comment:
+                "Mi perro mayor ha mejorado mucho su movilidad desde que duerme en esta cama. Totalmente recomendable.",
+            },
+            {
+              id: 2,
+              user: "Roberto Fernández",
+              rating: 5,
+              date: "20/02/2024",
+              comment: "Excelente calidad, mi mascota la adora. La funda es muy fácil de lavar.",
+            },
+            {
+              id: 3,
+              user: "Carmen Ruiz",
+              rating: 4,
+              date: "10/01/2024",
+              comment: "Muy buena cama, aunque el precio es algo elevado. La calidad justifica la inversión.",
+            },
+          ],
+        },
+        {
+          id: 4,
+          name: "Collar Ajustable con GPS",
+          category: "Accesorios",
+          price: 89000,
+          rating: 4.7,
+          stock: 12,
+          description:
+            "Collar inteligente con GPS integrado que te permite rastrear la ubicación de tu mascota en tiempo real a través de una aplicación móvil. Ideal para mascotas aventureras o propietarios preocupados. Además del rastreo GPS, este collar monitorea la actividad física de tu mascota, ayudándote a mantenerla saludable y activa.",
+          features: [
+            "Rastreo GPS en tiempo real",
+            "Monitoreo de actividad física",
+            "Resistente al agua (IP67)",
+            "Batería de larga duración (hasta 7 días)",
+            "Alertas de zonas seguras personalizables",
+            "Historial de ubicaciones",
+          ],
+          specifications: {
+            Material: "Nylon resistente y componentes electrónicos",
+            Tamaño: "Ajustable de 35 a 65 cm",
+            Peso: "45 g",
+            Batería: "Recargable por USB",
+            "Tiempo de carga": "2 horas",
+            Conectividad: "Bluetooth, WiFi, 4G",
+            "Aplicación compatible": "iOS y Android",
           },
-        ],
-      }
-
-      setProduct(mockProduct)
-
-      // Productos relacionados simulados
-      const mockRelatedProducts = [
+          images: [
+            "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1200",
+            "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=1200",
+            "https://images.unsplash.com/photo-1518155317743-a8ff43ea6a5f?q=80&w=1200",
+          ],
+          reviews: [
+            {
+              id: 1,
+              user: "Miguel Torres",
+              rating: 5,
+              date: "10/03/2024",
+              comment: "Este collar me da tranquilidad cuando mi perro sale al jardín. La aplicación es muy intuitiva.",
+            },
+            {
+              id: 2,
+              user: "Sofía Navarro",
+              rating: 4,
+              date: "25/02/2024",
+              comment: "Funciona muy bien, aunque la batería dura un poco menos de lo indicado con uso intensivo.",
+            },
+          ],
+        },
         {
           id: 5,
-          name: "Alimento Húmedo para Perros",
+          name: "Alimento Húmedo para Gatos",
           category: "Alimentos",
           price: 45000,
-          originalPrice: 50000,
-          discount: 10,
           rating: 4.6,
-          image: "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?q=80&w=500",
-        },
-        {
-          id: 8,
-          name: "Snacks Naturales para Perros",
-          category: "Alimentos",
-          price: 30000,
-          originalPrice: 30000,
-          discount: 0,
-          rating: 4.5,
-          image: "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?q=80&w=500",
-        },
-        {
-          id: 10,
-          name: "Champú Hipoalergénico",
-          category: "Higiene",
-          price: 28000,
-          originalPrice: 28000,
-          discount: 0,
-          rating: 4.4,
-          image: "https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?q=80&w=500",
+          stock: 25,
+          description:
+            "Alimento húmedo premium para gatos elaborado con ingredientes naturales de alta calidad. Formulado para proporcionar una nutrición completa y equilibrada, con un alto contenido de proteínas de origen animal que satisfacen las necesidades nutricionales específicas de los felinos. Su delicioso sabor y textura jugosa lo hacen irresistible incluso para los gatos más exigentes.",
+          features: [
+            "Ingredientes 100% naturales",
+            "Sin cereales ni rellenos",
+            "Alto contenido proteico (mínimo 40%)",
+            "Sin conservantes artificiales",
+            "Promueve la hidratación",
+            "Ayuda a la salud urinaria",
+          ],
+          specifications: {
+            Presentación: "Pack de 12 latas de 85g",
+            Sabores: "Pollo, Atún, Salmón y Pavo",
+            "Contenido proteico": "40-45%",
+            "Contenido graso": "15-20%",
+            Humedad: "78%",
+            "Edad recomendada": "Todas las edades",
+            Conservación: "Lugar fresco y seco, refrigerar después de abrir",
+          },
+          images: [
+            "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?q=80&w=1200",
+            "https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=1200",
+            "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?q=80&w=1200",
+          ],
+          reviews: [
+            {
+              id: 1,
+              user: "Isabel Moreno",
+              rating: 5,
+              date: "15/03/2024",
+              comment:
+                "Mi gato es muy quisquilloso con la comida, pero este alimento le encanta. Se lo come todo inmediatamente.",
+            },
+            {
+              id: 2,
+              user: "Javier López",
+              rating: 4,
+              date: "02/03/2024",
+              comment: "Buena calidad, aunque el precio es algo elevado. Mi gato lo disfruta mucho.",
+            },
+            {
+              id: 3,
+              user: "Elena Martín",
+              rating: 5,
+              date: "20/02/2024",
+              comment: "Desde que le doy este alimento, el pelaje de mi gato luce mucho más brillante y saludable.",
+            },
+          ],
         },
       ]
 
-      setRelatedProducts(mockRelatedProducts)
+      // Encontrar el producto por ID
+      const productIdParsed = Number.parseInt(productId)
+      const foundProduct = allProducts.find((p) => p.id === productIdParsed)
+
+      if (foundProduct) {
+        setProduct(foundProduct)
+
+        // Generar productos relacionados (misma categoría, excluyendo el producto actual)
+        const related = allProducts
+          .filter((p) => p.category === foundProduct.category && p.id !== foundProduct.id)
+          .slice(0, 3) // Limitar a 3 productos relacionados
+
+        setRelatedProducts(related)
+      }
+
       setLoading(false)
     }, 800)
-  }, [id])
+  }
 
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity < 1 || (product && newQuantity > product.stock)) return
@@ -156,6 +350,10 @@ const ProductoDetallePage = () => {
       pauseOnHover: true,
       draggable: true,
     })
+  }
+
+  const handleThumbnailClick = (index) => {
+    setSelectedImage(index)
   }
 
   if (loading) {
@@ -215,16 +413,19 @@ const ProductoDetallePage = () => {
             <div className="product-gallery">
               <div className="main-image-container mb-3">
                 <img
-                  src={product.images[0] || "/placeholder.svg"}
+                  src={product.images[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
                   className="main-image img-fluid rounded"
                 />
-                {product.discount > 0 && <div className="discount-badge">-{product.discount}%</div>}
               </div>
 
               <div className="thumbnail-container">
                 {product.images.map((image, index) => (
-                  <div key={index} className="thumbnail-item">
+                  <div
+                    key={index}
+                    className={`thumbnail-item ${selectedImage === index ? "active" : ""}`}
+                    onClick={() => handleThumbnailClick(index)}
+                  >
                     <img
                       src={image || "/placeholder.svg"}
                       alt={`${product.name} - Vista ${index + 1}`}
@@ -260,14 +461,7 @@ const ProductoDetallePage = () => {
               </div>
 
               <div className="product-price mb-4">
-                {product.discount > 0 ? (
-                  <>
-                    <span className="original-price">${product.originalPrice.toLocaleString()}</span>
-                    <span className="current-price">${product.price.toLocaleString()}</span>
-                  </>
-                ) : (
-                  <span className="current-price">${product.price.toLocaleString()}</span>
-                )}
+                <span className="current-price">${product.price.toLocaleString()}</span>
               </div>
 
               <div className="product-short-description mb-4">
@@ -284,7 +478,7 @@ const ProductoDetallePage = () => {
               <div className="product-actions mb-4">
                 <div className="quantity-selector d-flex align-items-center mb-3">
                   <span className="me-3">Cantidad:</span>
-                  <div className="input-group" style={{ width: "130px" }}>
+                  <div className="input-group" style={{ width: "150px" }}>
                     <Button
                       variant="outline-secondary"
                       onClick={() => handleQuantityChange(quantity - 1)}
@@ -293,7 +487,7 @@ const ProductoDetallePage = () => {
                       <i className="bi bi-dash"></i>
                     </Button>
                     <Form.Control
-                      type="number"
+                      type="text"
                       value={quantity}
                       onChange={(e) => handleQuantityChange(Number.parseInt(e.target.value) || 1)}
                       min="1"
@@ -320,10 +514,6 @@ const ProductoDetallePage = () => {
                   >
                     <i className="bi bi-cart-plus me-2"></i>
                     Añadir al Carrito
-                  </Button>
-
-                  <Button variant="outline-secondary" size="lg">
-                    <i className="bi bi-heart"></i>
                   </Button>
                 </div>
               </div>
@@ -462,7 +652,7 @@ const ProductoDetallePage = () => {
                 <div className="write-review mt-4">
                   <h4 className="mb-3">Escribe una Reseña</h4>
                   <p className="text-muted mb-3">
-                    Tu dirección de correo no será publicada. Los campos obligatorios están marcados con *
+                    Debes estar logueado y haber comprado este producto para dejar una reseña.
                   </p>
 
                   <Form>
@@ -480,22 +670,6 @@ const ProductoDetallePage = () => {
                       <Form.Control as="textarea" rows={4} />
                     </Form.Group>
 
-                    <Row>
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Nombre *</Form.Label>
-                          <Form.Control type="text" />
-                        </Form.Group>
-                      </Col>
-
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Correo electrónico *</Form.Label>
-                          <Form.Control type="email" />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-
                     <Button variant="success" type="submit">
                       Enviar Reseña
                     </Button>
@@ -507,54 +681,44 @@ const ProductoDetallePage = () => {
         </div>
 
         {/* Productos relacionados */}
-        <div className="related-products">
-          <h3 className="section-title mb-4">Productos Relacionados</h3>
+        {relatedProducts.length > 0 && (
+          <div className="related-products">
+            <h3 className="section-title mb-4">Productos Relacionados</h3>
 
-          <Row className="g-4">
-            {relatedProducts.map((relatedProduct) => (
-              <Col md={4} key={relatedProduct.id}>
-                <div className="related-product-card card h-100 border-0 shadow-sm">
-                  <Link to={`/producto/${relatedProduct.id}`} className="text-decoration-none">
-                    <div className="position-relative">
-                      <img
-                        src={relatedProduct.image || "/placeholder.svg"}
-                        alt={relatedProduct.name}
-                        className="card-img-top related-product-image"
-                      />
-                      {relatedProduct.discount > 0 && (
-                        <Badge bg="success" className="position-absolute top-0 start-0 m-2">
-                          -{relatedProduct.discount}%
-                        </Badge>
-                      )}
-                    </div>
+            <Row className="g-4">
+              {relatedProducts.map((relatedProduct) => (
+                <Col md={4} key={relatedProduct.id}>
+                  <div className="related-product-card card h-100 border-0 shadow-sm">
+                    <Link to={`/producto/${relatedProduct.id}`} className="text-decoration-none">
+                      <div className="position-relative">
+                        <img
+                          src={relatedProduct.image || "/placeholder.svg"}
+                          alt={relatedProduct.name}
+                          className="card-img-top related-product-image"
+                        />
+                      </div>
 
-                    <div className="card-body">
-                      <h5 className="card-title related-product-title">{relatedProduct.name}</h5>
+                      <div className="card-body">
+                        <h5 className="card-title related-product-title">{relatedProduct.name}</h5>
 
-                      <div className="d-flex justify-content-between align-items-center mt-2">
-                        <div className="related-product-price">
-                          {relatedProduct.discount > 0 ? (
-                            <>
-                              <span className="original-price">${relatedProduct.originalPrice.toLocaleString()}</span>
-                              <span className="current-price">${relatedProduct.price.toLocaleString()}</span>
-                            </>
-                          ) : (
+                        <div className="d-flex justify-content-between align-items-center mt-2">
+                          <div className="related-product-price">
                             <span className="current-price">${relatedProduct.price.toLocaleString()}</span>
-                          )}
-                        </div>
+                          </div>
 
-                        <div className="related-product-rating">
-                          <i className="bi bi-star-fill text-warning me-1"></i>
-                          <span>{relatedProduct.rating}</span>
+                          <div className="related-product-rating">
+                            <i className="bi bi-star-fill text-warning me-1"></i>
+                            <span>{relatedProduct.rating}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </div>
+                    </Link>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        )}
       </Container>
     </div>
   )

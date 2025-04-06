@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { Outlet, useLocation } from "react-router-dom"
-import PropTypes from "prop-types" // Para validar props (opcional)
 import Sidebar from "../../Components/AdminComponents/Sidebar"
 import UserProfile from "../../Components/AdminComponents/UserProfile"
-import "../../Styles/AdminStyles/Layout.css"
+import { motion } from "framer-motion"
+import "./Layout.scss"
 
-const Layout = () => {
+const Layout = ({ footerComponent }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
 
@@ -27,12 +27,33 @@ const Layout = () => {
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Overlay para dispositivos móviles */}
-      {sidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar} />}
+      {sidebarOpen && (
+        <motion.div
+          className="sidebar-overlay"
+          onClick={toggleSidebar}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        />
+      )}
 
-      <div className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}>
+      <motion.div
+        className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}
+        animate={{
+          marginLeft: sidebarOpen ? (window.innerWidth < 768 ? "0" : "280px") : "0",
+          width: sidebarOpen && window.innerWidth >= 768 ? "calc(100% - 280px)" : "100%",
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
         <header className="header">
           <div className="header-content">
-            <button className="menu-toggle" onClick={toggleSidebar} aria-label="Abrir/Cerrar menú">
+            <motion.button
+              className="menu-toggle"
+              onClick={toggleSidebar}
+              aria-label="Abrir/Cerrar menú"
+              whileTap={{ scale: 0.9 }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -46,11 +67,7 @@ const Layout = () => {
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
-            </button>
-
-            <div className="page-info">
-              <p>Bienvenido al panel de administración</p>
-            </div>
+            </motion.button>
 
             <UserProfile />
           </div>
@@ -60,28 +77,12 @@ const Layout = () => {
           <Outlet />
         </main>
 
-        <footer className="footer">
-          <div className="footer-content">
-            <div className="footer-brand">
-              <span className="brand-text">
-                Teo<span className="text-success">/Cat</span>
-              </span>
-              <p className="footer-tagline">Productos y servicios para mascotas</p>
-            </div>
-            <div className="footer-info">
-              <p className="copyright">© {new Date().getFullYear()} Teo/Cat. Todos los derechos reservados.</p>
-              <p className="location">Medellín, Colombia</p>
-            </div>
-          </div>
-        </footer>
-      </div>
+        {/* Usar el componente de footer pasado como prop o el Footer por defecto */}
+        {footerComponent}
+      </motion.div>
     </div>
   )
 }
 
-// Validación de props (opcional)
-Layout.propTypes = {
-  // Agrega props si es necesario
-}
-
 export default Layout
+

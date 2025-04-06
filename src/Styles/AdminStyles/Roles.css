@@ -80,3 +80,19 @@
   }
 }
 
+/* Estilos para las secciones desplegables */
+.module-header {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.module-header:hover {
+  background-color: #e0e0e0;
+}
+
+.module-header td {
+  padding: 10px 15px;
+}
+

@@ -1,88 +1,115 @@
-/* Estilos para el contenedor principal */
+/* Estilos generales */
 .nueva-cita-container {
   padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* Layout principal de la aplicación */
-.appointment-layout {
+/* Layout principal de dos paneles */
+.cita-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) 2fr;
+  grid-template-columns: 350px 1fr;
   gap: 20px;
 }
 
-/* Sección del calendario */
-.calendar-section {
+/* Estilos para los paneles */
+.cita-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* Sección del formulario */
-.form-section {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-}
-
-/* Estilos para el calendario */
-.calendar-container {
+.panel-section {
   background-color: white;
   border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Estilos para el calendario compacto */
+.calendar-compact {
+  width: 100%;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 12px;
 }
 
 .calendar-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #333;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  background-color: #f0f0f0;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 4px;
 }
 
 .calendar-weekday {
   text-align: center;
   font-weight: 600;
   color: #666;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
+  padding: 4px 0;
+  font-size: 0.8rem;
 }
 
 .calendar-day {
   position: relative;
-  height: 40px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  font-size: 0.85rem;
 }
 
 .calendar-day:hover {
   background-color: #f0f0f0;
-  border-color: #ddd;
 }
 
 .calendar-day.other-month {
-  color: #aaa;
-  background-color: #f9f9f9;
+  color: #ccc;
 }
 
 .calendar-day.selected {
@@ -97,22 +124,31 @@
   font-weight: 600;
 }
 
-.calendar-day.past {
+.calendar-day.past,
+.calendar-day.sunday {
   color: #ccc;
   background-color: #f9f9f9;
   cursor: not-allowed;
 }
 
-.day-number {
-  font-size: 0.95rem;
+.citas-count {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Estilos para los horarios */
 .time-slots-container {
-  background-color: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .time-slots-title {
@@ -124,23 +160,24 @@
 
 .time-slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .time-slot {
-  padding: 0.75rem 0.5rem;
+  padding: 8px 4px;
   text-align: center;
   background-color: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid #dee2e6;
+  position: relative;
+  font-size: 0.85rem;
 }
 
 .time-slot:hover {
   background-color: #e9ecef;
-  border-color: #ced4da;
 }
 
 .time-slot.selected {
@@ -150,71 +187,252 @@
   border-color: #0d6efd;
 }
 
-.no-slots-message {
-  grid-column: 1 / -1;
+.time-slot.ocupado {
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+  color: #842029;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.ocupado-badge {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  font-size: 0.6rem;
+  color: #842029;
+}
+
+.no-slots-available {
   text-align: center;
-  padding: 1rem;
+  padding: 16px;
+  background-color: #fff3cd;
+  border: 1px solid #ffecb5;
+  border-radius: 4px;
+  color: #664d03;
+  font-size: 0.9rem;
+}
+
+.no-slots-message {
+  text-align: center;
+  padding: 16px;
   color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Estilos para las citas agendadas */
+.citas-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-box,
+.date-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon,
+.filter-icon {
+  position: absolute;
+  left: 8px;
+  color: #6c757d;
+}
+
+.search-box input,
+.date-filter input {
+  width: 100%;
+  padding: 6px 30px 6px 30px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.btn-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.citas-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.citas-group {
+  margin-bottom: 12px;
+}
+
+.citas-date {
+  font-weight: 600;
+  color: #495057;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.cita-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 8px;
+  align-items: center;
   background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px dashed #dee2e6;
-}
-
-/* Estilos para el formulario en formato catálogo */
-.catalog-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.catalog-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.catalog-card {
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 4px;
   border: 1px solid #e9ecef;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: #fff;
-  height: auto;
-  margin-bottom: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.catalog-card-header {
-  background-color: #f8f9fa;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e9ecef;
+.cita-item:hover {
+  background-color: #e9ecef;
 }
 
-.catalog-card-header h5 {
-  margin: 0;
-  font-size: 1rem;
+.cita-time {
+  font-weight: 600;
+  color: #0d6efd;
+  font-size: 0.85rem;
+}
+
+.cita-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cita-cliente {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.cita-mascota {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.cita-service {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.cita-status {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cita-status.programada {
+  background-color: #cff4fc;
+  color: #055160;
+}
+
+.cita-status.confirmada {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.cita-status.completada {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+.cita-status.cancelada {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.no-citas-message {
+  text-align: center;
+  padding: 16px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Estilos para el formulario */
+.form-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #333;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
   display: flex;
   align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #495057;
 }
 
-.catalog-card-body {
-  padding: 0.75rem;
+.label-icon {
+  font-size: 1rem;
 }
 
-/* Estilos para la tarjeta de información de mascota */
-.pet-info-card {
+.required {
+  color: #dc3545;
+}
+
+.select-container {
+  position: relative;
+}
+
+.form-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+/* Estilos para la tarjeta de mascota */
+.pet-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background-color: #f8f9fa;
   border-radius: 8px;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
+  padding: 12px;
+  margin-top: 8px;
   border: 1px solid #e9ecef;
-}
-
-.pet-info-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 0.75rem;
 }
 
 .pet-avatar {
@@ -228,152 +446,151 @@
   font-size: 1.5rem;
 }
 
-.pet-info-name h6 {
-  margin: 0;
-  font-weight: 600;
-  font-size: 0.95rem;
+.pet-details {
+  flex: 1;
 }
 
-.pet-info-name p {
+.pet-details h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.pet-details p {
   margin: 0;
   font-size: 0.85rem;
   color: #6c757d;
 }
 
-.pet-info-details {
+.pet-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.pet-stat {
   display: flex;
   flex-direction: column;
+  font-size: 0.8rem;
+}
+
+.pet-stat span:first-child {
+  color: #6c757d;
+}
+
+.pet-stat span:last-child {
+  font-weight: 500;
+  color: #0d6efd;
+}
+
+/* Estilos para múltiples mascotas */
+.mascotas-selector {
+  margin-top: 8px;
+}
+
+.mascotas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
 }
 
-.pet-info-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  padding: 0.5rem;
-  background-color: white;
-  border-radius: 4px;
-  border: 1px solid #e9ecef;
-}
-
-/* Estilos para la tarjeta de información de servicio */
-.service-info-card {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  border: 1px solid #e9ecef;
-}
-
-.service-info-header {
+.mascota-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 0.75rem;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.service-icon {
-  width: 36px;
-  height: 36px;
+.mascota-item:hover {
+  background-color: #e9ecef;
+}
+
+.mascota-item.selected {
+  background-color: #e6f2ff;
+  border-color: #0d6efd;
+}
+
+.mascota-avatar {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: #e6f2ff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
 }
 
-.service-info-name h6 {
-  margin: 0;
-  font-weight: 600;
-  font-size: 0.95rem;
+.mascota-info {
+  flex: 1;
 }
 
-.service-info-details {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.service-info-item {
-  display: flex;
-  justify-content: space-between;
+.mascota-name {
+  font-weight: 500;
   font-size: 0.9rem;
-  padding: 0.5rem;
-  background-color: white;
+}
+
+.mascota-breed {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.mascota-check {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d6efd;
+  font-weight: bold;
+}
+
+.selected-mascotas {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
   border-radius: 4px;
   border: 1px solid #e9ecef;
 }
 
-/* Estilos para los botones */
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+.selected-mascotas-count {
+  font-size: 0.85rem;
+  color: #495057;
+  margin-bottom: 6px;
 }
 
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
+.selected-mascotas-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
+.selected-mascota-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background-color: #e6f2ff;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  color: #0d6efd;
 }
 
-.btn-secondary:hover {
-  background-color: #5c636a;
-  border-color: #565e64;
+/* Estilos para los servicios */
+.services-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Estilos para dispositivos móviles */
-@media (max-width: 991.98px) {
-  .appointment-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog-layout {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 767.98px) {
-  .time-slots-grid {
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  }
-
-  .catalog-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .time-slots-grid {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  }
-
-  .row > div {
-    margin-bottom: 0.75rem;
-  }
-
-  .row > div:last-child {
-    margin-bottom: 0;
-  }
-}
-
-/* Añadir estos estilos para corregir el problema de los dropdowns */
-.react-select__menu {
-  z-index: 9999 !important;
-}
-
-/* Reemplazar con estos estilos más específicos */
-.react-select-container .react-select__menu {
-  z-index: 9999 !important;
-  position: absolute !important;
-}
-
-/* Estilos para la lista de servicios seleccionados */
-.selected-services-list {
-  margin-top: 0.5rem;
+.selected-services {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   max-height: 200px;
   overflow-y: auto;
 }
@@ -382,89 +599,170 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
+  padding: 8px;
   background-color: #f8f9fa;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
+  border-radius: 4px;
   border: 1px solid #e9ecef;
 }
 
-.service-item-details {
+.service-info {
   display: flex;
   flex-direction: column;
 }
 
-.service-item-name {
-  font-weight: 600;
+.service-name {
+  font-weight: 500;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.service-item-info {
+.multiple-mascotas-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background-color: #cff4fc;
+  color: #055160;
+  border-radius: 10px;
+}
+
+.service-details {
+  display: flex;
+  gap: 12px;
   font-size: 0.8rem;
   color: #6c757d;
 }
 
-.service-item-price {
-  font-weight: 600;
+.service-price {
+  font-weight: 500;
   color: #0d6efd;
 }
 
-.service-item-remove {
+.btn-remove {
   background: none;
   border: none;
   color: #dc3545;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 4px;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.service-item-remove:hover {
+.btn-remove:hover {
   background-color: #f8d7da;
 }
 
 .service-total {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem;
+  padding: 8px;
   background-color: #e6f2ff;
-  border-radius: 6px;
-  margin-top: 0.5rem;
+  border-radius: 4px;
   font-weight: 600;
+  margin-top: 4px;
 }
 
-.add-service-btn {
+/* Estilos para la fecha y hora */
+.datetime-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-display,
+.time-display {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  margin-top: 0.5rem;
+  gap: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
 }
 
-/* Añadir estos estilos al final del archivo para asegurar que los menús de react-select aparezcan correctamente */
-
-/* Estilos para los menús de react-select */
-.react-select__menu-portal {
-  z-index: 9999 !important;
+/* Estilos para los botones de acción */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-body .react-select__menu {
-  z-index: 9999 !important;
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
 }
 
-/* Asegurar que los contenedores no creen nuevos contextos de apilamiento */
-.catalog-card,
-.catalog-card-body,
-.catalog-section,
-.catalog-layout,
-.form-section {
-  position: relative;
-  z-index: 1;
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
 }
 
-/* Asegurar que los menús desplegables estén por encima */
-.react-select__dropdown-indicator,
-.react-select__control {
-  z-index: 2;
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 991.98px) {
+  .cita-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cita-item {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .cita-time {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .cita-status {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .cita-info {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cita-service {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
+
+  .mascotas-grid {
+    grid-template-columns: 1fr;
+  }
 }
 

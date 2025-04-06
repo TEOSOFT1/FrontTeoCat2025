@@ -14,10 +14,10 @@ import {
   Archive,
   Printer,
 } from "lucide-react"
-import "../../Styles/AdminStyles/TableActions.css"
+import "../AdminComponents/TableActions.scss"
 
 // Componente para un botón de acción individual
-const ActionButton = ({ icon, label, color, onClick }) => (
+const ActionButton = ({ icon, label, color, onClick, actionKey }) => (
   <button
     type="button"
     className={`btn btn-${color} btn-sm action-button`}
@@ -30,6 +30,7 @@ const ActionButton = ({ icon, label, color, onClick }) => (
     }}
     data-bs-toggle="tooltip"
     data-bs-placement="top"
+    data-action={actionKey}
     title={label}
   >
     {React.createElement(icon, { size: 16 })}
@@ -131,7 +132,22 @@ const TableActions = ({
     import("bootstrap").then((bootstrap) => {
       // Inicializar todos los tooltips
       const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-      tooltipInstances = tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl))
+      tooltipInstances = tooltipTriggerList.map((tooltipTriggerEl) => {
+        const tooltip = new bootstrap.Tooltip(tooltipTriggerEl)
+
+        // Añadir el atributo data-action al tooltip
+        tooltipTriggerEl.addEventListener("inserted.bs.tooltip", () => {
+          const action = tooltipTriggerEl.getAttribute("data-action")
+          if (action) {
+            const tooltipElement = document.querySelector(".tooltip .tooltip-inner")
+            if (tooltipElement) {
+              tooltipElement.setAttribute("data-action", action)
+            }
+          }
+        })
+
+        return tooltip
+      })
     })
 
     // Limpiar tooltips cuando el componente se desmonta
@@ -153,7 +169,7 @@ const TableActions = ({
 
   // Solo renderizar las acciones especificadas
   return (
-    <div className="d-flex gap-1 justify-content-center">
+    <div className="table-actions-container">
       {actions.map((actionKey, index) => {
         if (!actionKey) return null
         const action = actionButtons[actionKey]
@@ -166,6 +182,7 @@ const TableActions = ({
             label={action.label}
             color={action.color}
             onClick={action.onClick}
+            actionKey={actionKey}
           />
         )
       })}

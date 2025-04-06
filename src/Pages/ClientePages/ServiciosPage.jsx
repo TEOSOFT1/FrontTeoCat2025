@@ -1,15 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Button } from "react-bootstrap"
-import ServiceCard from "../../Components/ClienteComponents/ServiceCard"
-import "./ServiciosPage.scss"
+import ServiceCard from "../../Components/ClienteComponents/ServiciosComponents/ServiceCard"
+import "../../Pages/ClientePages/ServiciosPage.scss"
 
 const ServiciosPage = () => {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
 
   useEffect(() => {
     // Simulación de carga de datos desde API
@@ -67,11 +66,6 @@ const ServiciosPage = () => {
     setLoading(false)
   }, [])
 
-  const handleServiceClick = (serviceId) => {
-    // Redirigir a la página de agendar cita con el ID del servicio como parámetro de consulta
-    navigate(`/agendar-cita?servicio=${serviceId}`)
-  }
-
   if (loading) {
     return (
       <div className="container py-5 mt-5 text-center">
@@ -124,9 +118,9 @@ const ServiciosPage = () => {
         <div className="row g-4 mb-5">
           {services.map((service) => (
             <div key={service.id} className="col-md-6 col-lg-4">
-              <div onClick={() => handleServiceClick(service.id)} style={{ cursor: "pointer" }}>
+              <Link to={`/servicio/${service.id}`} className="text-decoration-none">
                 <ServiceCard service={service} />
-              </div>
+              </Link>
             </div>
           ))}
         </div>
